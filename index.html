@@ -1,0 +1,3342 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FDX — Engenharia de Software Acessível</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET E VARIÁVEIS ===== */
+:root {
+  --bg:      #0a0d12;
+  --bg2:     #111720;
+  --bg3:     #181f2c;
+  --bg4:     #1e2738;
+  --amber:   #e8a020;
+  --amber2:  #f5b942;
+  --amber-g: rgba(232,160,32,0.10);
+  --amber-b: rgba(232,160,32,0.25);
+  --teal:    #1ec8c8;
+  --teal-g:  rgba(30,200,200,0.10);
+  --red:     #e05252;
+  --red-g:   rgba(224,82,82,0.12);
+  --green:   #3ecf7a;
+  --green-g: rgba(62,207,122,0.10);
+  --blue:    #4fa3e0;
+  --blue-g:  rgba(79,163,224,0.10);
+  --text:    #dce6f0;
+  --text2:   #8a9ab0;
+  --text3:   #4a5568;
+  --border:  rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.12);
+  --mono:    'IBM Plex Mono', monospace;
+  --sans:    'IBM Plex Sans', sans-serif;
+  --sw:      260px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== FOCO VISÍVEL ===== */
+:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--amber2);
+  outline-offset: 2px;
+}
+
+/* ===== SKIP LINK ===== */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--amber);
+  color: #000;
+  padding: 8px;
+  z-index: 1000;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 0 0 4px 0;
+}
+
+.skip-link:focus-visible {
+  top: 0;
+}
+
+/* ===== SIDEBAR ===== */
+.sb {
+  width: var(--sw);
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  position: fixed;
+  inset: 0 auto 0 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 200;
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
+  overflow: hidden;
+}
+
+.sb-logo {
+  padding: 22px 18px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.sb-logo-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--amber-g);
+  border: 1px solid var(--amber-b);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  aria-hidden: true;
+}
+
+.sb-logo-name {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--amber);
+}
+
+.sb-logo-sub {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 1px;
+}
+
+.sb-close {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text2);
+  font-size: 18px;
+  cursor: pointer;
+  margin-left: auto;
+  padding: 4px;
+}
+
+.sb-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 8px;
+}
+
+.sb-nav::-webkit-scrollbar {
+  width: 3px;
+}
+
+.sb-nav::-webkit-scrollbar-thumb {
+  background: var(--border2);
+}
+
+.sb-section {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  color: var(--text3);
+  text-transform: uppercase;
+  padding: 14px 10px 5px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 12px;
+  border-radius: 7px;
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 400;
+  cursor: pointer;
+  margin-bottom: 1px;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  transition: all .15s;
+  font-family: var(--sans);
+}
+
+.nav-item:hover {
+  color: var(--text);
+  background: var(--bg3);
+}
+
+.nav-item.active {
+  color: var(--amber);
+  background: var(--amber-g);
+  font-weight: 500;
+  border-left: 2px solid var(--amber);
+  padding-left: 10px;
+}
+
+.nav-item .ni {
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+  aria-hidden: true;
+}
+
+.sb-foot {
+  padding: 12px 8px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.btn-exp,
+.btn-imp {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: all .15s;
+}
+
+.btn-exp {
+  background: var(--amber-g);
+  border: 1px solid var(--amber-b);
+  color: var(--amber);
+}
+
+.btn-exp:hover {
+  background: var(--amber-b);
+}
+
+.btn-imp {
+  background: var(--teal-g);
+  border: 1px solid rgba(30,200,200,0.25);
+  color: var(--teal);
+}
+
+.btn-imp:hover {
+  background: rgba(30,200,200,0.18);
+}
+
+/* ===== MAIN ===== */
+.main {
+  margin-left: var(--sw);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.topbar {
+  height: 54px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.hbg {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text2);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.topbar-title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.topbar-title span {
+  color: var(--text3);
+  font-weight: 400;
+  margin-left: 8px;
+  font-size: 12px;
+}
+
+.btn-sv {
+  background: var(--amber);
+  color: #000;
+  border: none;
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: opacity .15s;
+}
+
+.btn-sv:hover {
+  opacity: .85;
+}
+
+.btn-rs {
+  background: var(--bg3);
+  color: var(--text2);
+  border: 1px solid var(--border);
+  padding: 7px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: var(--sans);
+}
+
+.content {
+  padding: 28px;
+  flex: 1;
+  max-width: 1360px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ===== HEADINGS ===== */
+.mod-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--amber-g);
+  border: 1px solid var(--amber-b);
+  color: var(--amber);
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
+}
+
+.mod-title {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -.3px;
+}
+
+.mod-desc {
+  font-size: 13px;
+  color: var(--text2);
+  margin-top: 5px;
+}
+
+.mod-head {
+  margin-bottom: 26px;
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+}
+
+.card-head:focus-visible {
+  outline: 2px solid var(--amber2);
+  outline-offset: -2px;
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-body {
+  padding: 18px;
+  display: none;
+}
+
+.card-body.open {
+  display: block;
+}
+
+.chevron {
+  transition: transform .2s;
+  font-size: 12px;
+  color: var(--text3);
+  aria-hidden: true;
+}
+
+.card-head.open .chevron {
+  transform: rotate(180deg);
+}
+
+/* ===== FORMS ===== */
+.fgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 18px;
+}
+
+.fg {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  background: rgba(255,255,255,.01);
+  position: relative;
+}
+
+.fg::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: -9px;
+  height: 1px;
+  background: var(--border2);
+}
+
+.fgrid .fg:last-child::after {
+  display: none;
+}
+
+label, .lbl {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: .8px;
+}
+
+input, select, textarea {
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 8px 11px;
+  outline: none;
+  width: 100%;
+  transition: border-color .15s;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--amber-b);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 56px;
+  line-height: 1.5;
+}
+
+.hint {
+  font-size: 10px;
+  color: silver;
+  margin-top: 4px;
+  font-family: var(--mono);
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--sans);
+  border: none;
+  transition: all .15s;
+}
+
+.btn-primary {
+  background: var(--amber);
+  color: #000;
+}
+
+.btn-primary:hover {
+  background: var(--amber2);
+}
+
+.btn-teal {
+  background: var(--teal-g);
+  color: var(--teal);
+  border: 1px solid rgba(30,200,200,0.2);
+}
+
+.btn-teal:hover {
+  background: rgba(30,200,200,0.2);
+}
+
+.btn-danger {
+  background: var(--red-g);
+  color: var(--red);
+  border: 1px solid rgba(224,82,82,0.2);
+}
+
+.btn-danger:hover {
+  background: rgba(224,82,82,0.25);
+}
+
+.btn-ghost {
+  background: var(--bg3);
+  color: var(--text2);
+  border: 1px solid var(--border);
+}
+
+.btn-ghost:hover {
+  color: var(--text);
+  background: var(--bg4);
+}
+
+.btn-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--amber-g);
+  border: 1px dashed var(--amber-b);
+  color: var(--amber);
+  padding: 8px 14px;
+  border-radius: 7px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 12px;
+  font-family: var(--sans);
+  transition: background .15s;
+}
+
+.btn-add:hover {
+  background: var(--amber-b);
+}
+
+/* ===== BOM ===== */
+.bom-tree {
+  margin-left: 18px;
+  border-left: 1px dashed rgba(232,160,32,.3);
+  padding-left: 14px;
+}
+
+.bom-item {
+  margin: 8px 0;
+  padding: 10px 14px;
+  background: var(--bg3);
+  border-radius: 7px;
+  border-left: 3px solid var(--amber);
+}
+
+.bom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bom-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.bom-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ei {
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 4px 7px;
+  border-radius: 4px;
+  outline: none;
+}
+
+.ei:focus {
+  border-color: var(--amber-b);
+}
+
+.bom-acts {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* ===== TIPOS GRID ===== */
+.tipos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.tipo-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color .2s;
+}
+
+.tipo-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--amber), transparent);
+}
+
+.tipo-card:hover {
+  border-color: var(--amber-b);
+}
+
+.tipo-id {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: rgba(66, 234, 234, 0.4);
+  margin-bottom: 4px;
+}
+
+.tipo-name {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.tipo-stats {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tipo-stat {
+  background: var(--bg);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: var(--text2);
+  text-align: center;
+}
+
+.tipo-stat strong {
+  display: block;
+  font-size: 17px;
+  color: var(--amber);
+  font-family: var(--mono);
+}
+
+.tipo-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 12px;
+  min-height: 20px;
+}
+
+.tag {
+  display: inline-block;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--text2);
+}
+
+.tag-amber {
+  border-color: var(--amber-b);
+  color: var(--amber);
+  background: var(--amber-g);
+}
+
+.tag-teal {
+  border-color: rgba(30,200,200,.25);
+  color: var(--teal);
+  background: var(--teal-g);
+}
+
+.tag-red {
+  border-color: rgba(224,82,82,.25);
+  color: var(--red);
+  background: var(--red-g);
+}
+
+.tag-green {
+  border-color: rgba(62,207,122,.25);
+  color: var(--green);
+  background: var(--green-g);
+}
+
+.tipo-acts {
+  display: flex;
+  gap: 6px;
+}
+
+/* ===== FORMULA EDITOR ===== */
+.fe-wrap {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 12px;
+}
+
+.fe-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr auto;
+  gap: 8px;
+  align-items: start;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  border-radius: 7px;
+  margin-bottom: 8px;
+}
+
+.fe-param-row {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 90px 70px auto;
+  gap: 8px;
+  align-items: start;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  border-radius: 7px;
+  margin-bottom: 8px;
+}
+
+.fe-col-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.btn-rm {
+  background: var(--red-g);
+  color: var(--red);
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background .15s;
+}
+
+.btn-rm:hover {
+  background: rgba(224,82,82,.25);
+}
+
+/* ===== FORMULA PREVIEW ===== */
+.fpreview {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-family: var(--mono);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-height: 38px;
+}
+
+.fp-name {
+  color: var(--teal);
+  font-weight: 600;
+}
+
+.fp-eq {
+  color: var(--text3);
+}
+
+.fp-expr {
+  color: var(--text);
+}
+
+.vars-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+  min-height: 24px;
+}
+
+.pill {
+  font-size: 10px;
+  padding: 3px 9px;
+  border-radius: 12px;
+  font-family: var(--mono);
+  font-weight: 500;
+}
+
+.pill-ok {
+  background: var(--green-g);
+  color: var(--green);
+  border: 1px solid rgba(62,207,122,.3);
+}
+
+.pill-const {
+  background: var(--blue-g);
+  color: var(--blue);
+  border: 1px solid rgba(79,163,224,.3);
+}
+
+.pill-unk {
+  background: var(--red-g);
+  color: var(--red);
+  border: 1px solid rgba(224,82,82,.3);
+}
+
+/* ===== ALERTS ===== */
+.alert {
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.alert-ok {
+  background: var(--green-g);
+  color: var(--green);
+  border: 1px solid rgba(62,207,122,.3);
+}
+
+.alert-warn {
+  background: var(--amber-g);
+  color: var(--amber);
+  border: 1px solid var(--amber-b);
+}
+
+.alert-err {
+  background: var(--red-g);
+  color: var(--red);
+  border: 1px solid rgba(224,82,82,.3);
+}
+
+/* ===== CALC RESULTS ===== */
+.calc-box {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+
+.calc-box-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 12px;
+}
+
+.calc-step {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.calc-step:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.calc-step-name {
+  font-family: var(--mono);
+  color: var(--teal);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.calc-step-orig {
+  color: var(--text2);
+  font-size: 12px;
+  font-family: var(--mono);
+}
+
+.calc-step-sub {
+  color: var(--text3);
+  font-size: 11px;
+  font-family: var(--mono);
+  margin-top: 2px;
+}
+
+.calc-step-val {
+  color: var(--green);
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 3px;
+}
+
+.calc-display {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 7px 12px;
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--green);
+}
+
+/* ===== TABLE ===== */
+.tbl-wrap {
+  overflow-x: auto;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+th {
+  background: var(--bg3);
+  color: var(--text2);
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 700;
+}
+
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background: var(--bg3);
+}
+
+/* ===== MODAL ===== */
+.modal-bg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  z-index: 400;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-bg.show {
+  display: flex;
+}
+
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 26px;
+  width: 880px;
+  max-width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-title {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 20px;
+  padding: 4px;
+  line-height: 1;
+}
+
+.modal-section {
+  margin-bottom: 20px;
+}
+
+.modal-sec-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--amber);
+  margin-bottom: 12px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+/* ===== CONFIRM ===== */
+.confirm-bg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.7);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirm-bg.show {
+  display: flex;
+}
+
+.confirm {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 24px;
+  width: 400px;
+  max-width: 94vw;
+}
+
+.confirm-msg {
+  font-size: 14px;
+  color: var(--text2);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.confirm-acts {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  padding: 11px 18px;
+  border-radius: 9px;
+  z-index: 999;
+  transform: translateY(70px);
+  opacity: 0;
+  transition: all .3s;
+  font-size: 13px;
+  max-width: 300px;
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast.ok {
+  border-color: rgba(62,207,122,.4);
+  color: var(--green);
+}
+
+.toast.err {
+  border-color: rgba(224,82,82,.4);
+  color: var(--red);
+}
+
+/* ===== OVERLAY ===== */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 150;
+}
+
+.overlay.show {
+  display: block;
+}
+
+/* ===== EMPTY ===== */
+.empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text3);
+}
+
+.empty-icon {
+  font-size: 38px;
+  margin-bottom: 12px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 14px 0;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  /* ── Layout base ── */
+  .sb {
+    transform: translateX(-100%);
+  }
+  .sb.open {
+    transform: translateX(0);
+  }
+  .sb-close,
+  .hbg {
+    display: block;
+  }
+  .main {
+    margin-left: 0;
+  }
+
+  /* ── Tipografia: legibilidade no smartphone ── */
+  body {
+    font-size: 15px;
+  }
+  .mod-title {
+    font-size: 20px;
+  }
+  .mod-desc {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  label, .lbl {
+    font-size: 12px;
+    letter-spacing: .4px;
+  }
+  input, select, textarea {
+    /* 16px evita zoom automático no iOS ao focar campos */
+    font-size: 16px;
+    padding: 10px 12px;
+  }
+  .hint {
+    font-size: 12px;
+  }
+  td, th {
+    font-size: 13px;
+  }
+  .card-title {
+    font-size: 14px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+  .nav-item {
+    font-size: 15px;
+    padding: 12px 14px;
+  }
+  .sb-section {
+    font-size: 10px;
+    padding: 16px 12px 6px;
+  }
+
+  /* ── Alvos de toque mínimo 44 × 44 px (WCAG 2.5.5) ── */
+  .btn,
+  .btn-add,
+  .btn-exp,
+  .btn-imp,
+  .btn-sv,
+  .btn-rs,
+  .nav-item,
+  .modal-close,
+  .btn-rm {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  .btn {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+  .btn-add {
+    padding: 12px 16px;
+    font-size: 13px;
+    width: 100%;
+    justify-content: center;
+    margin-top: 14px;
+  }
+  .btn-sv {
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+  .btn-rs {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+  .btn-exp,
+  .btn-imp {
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+  .btn-rm {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+    border-radius: 8px;
+  }
+
+  /* ── Card head: área clicável ampla ── */
+  .card-head {
+    padding: 16px 14px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  /* ── BOM: botões e campos acessíveis ── */
+  .bom-acts {
+    width: 100%;
+    justify-content: flex-start;
+    margin-top: 8px;
+    gap: 8px;
+  }
+  .bom-acts .btn {
+    flex: 1;
+    justify-content: center;
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+  .bom-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+  }
+  .bom-info .ei {
+    width: 100% !important;
+    font-size: 15px;
+    padding: 8px 10px;
+    min-height: 40px;
+  }
+
+  /* ── Tipo cards: botões empilhados ── */
+  .tipos-grid {
+    grid-template-columns: 1fr;
+  }
+  .tipo-acts {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .tipo-acts .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* ── Formulários ── */
+  .fgrid {
+    grid-template-columns: 1fr;
+  }
+  .fe-param-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .fe-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* ── Modal ── */
+  .modal {
+    padding: 18px 14px;
+  }
+  .modal-head {
+    margin-bottom: 16px;
+  }
+  .modal-title {
+    font-size: 16px;
+  }
+  .modal-foot {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+  .modal-foot .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* ── Topbar ── */
+  .topbar {
+    gap: 10px;
+    padding: 0 14px;
+  }
+  .topbar-title {
+    font-size: 13px;
+  }
+  .topbar-title span {
+    display: none;
+  }
+
+  /* ── Confirm dialog ── */
+  .confirm {
+    padding: 20px 16px;
+  }
+  .confirm-msg {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .confirm-acts {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+  .confirm-acts .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* ── Resultados de cálculo ── */
+  .calc-box {
+    padding: 12px;
+  }
+  .calc-step-orig,
+  .calc-step-sub {
+    word-break: break-word;
+    font-size: 11px;
+  }
+  .calc-step-val {
+    font-size: 16px;
+  }
+  .calc-display {
+    font-size: 15px;
+  }
+
+  /* ── Padding de conteúdo ── */
+  .content {
+    padding: 16px 14px;
+  }
+
+  /* ── Painel PCD: posição mobile ── */
+  .a11y-panel {
+    bottom: 88px;
+    left: 14px;
+    right: 14px;
+    width: auto;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .a11y-btn {
+    bottom: 18px;
+    left: 18px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ACESSIBILIDADE PCD — WCAG 2.1 AA
+   Perceptível · Operável · Compreensível · Robusto
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Botão flutuante de acessibilidade ── */
+.a11y-btn {
+  position: fixed;
+  bottom: 22px;
+  left: 22px;
+  z-index: 998;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--amber);
+  color: #000;
+  border: 2px solid transparent;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,.55);
+  transition: transform .15s, background .15s, box-shadow .15s;
+  font-family: var(--sans);
+}
+.a11y-btn:hover {
+  transform: scale(1.08);
+  background: var(--amber2);
+  box-shadow: 0 6px 24px rgba(232,160,32,.4);
+}
+.a11y-btn:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+/* Badge de estado ativo */
+.a11y-btn[aria-expanded="true"] {
+  background: var(--amber2);
+  box-shadow: 0 0 0 4px rgba(232,160,32,.3), 0 4px 20px rgba(0,0,0,.5);
+}
+/* Indicador visual de modos ativos */
+.a11y-active-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--green);
+  border: 2px solid #000;
+  display: none;
+}
+.a11y-btn.has-active .a11y-active-dot {
+  display: block;
+}
+
+/* ── Painel principal ── */
+.a11y-panel {
+  position: fixed;
+  bottom: 90px;
+  left: 22px;
+  z-index: 997;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  padding: 0;
+  width: 300px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.7);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+.a11y-panel.open {
+  display: flex;
+}
+
+/* Cabeçalho do painel */
+.a11y-panel-header {
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 16px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.a11y-panel-header-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+.a11y-panel-header-text {
+  flex: 1;
+}
+.a11y-panel-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--amber);
+  display: block;
+}
+.a11y-panel-subtitle {
+  font-size: 10px;
+  color: var(--text3);
+  display: block;
+  margin-top: 1px;
+}
+.a11y-panel-close {
+  background: none;
+  border: none;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color .12s;
+}
+.a11y-panel-close:hover { color: var(--text); }
+.a11y-panel-close:focus-visible {
+  outline: 2px solid var(--amber2);
+  outline-offset: 2px;
+}
+
+/* Corpo do painel */
+.a11y-panel-body {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Seções do painel */
+.a11y-section-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  padding: 8px 8px 3px;
+}
+
+/* Linhas de opção */
+.a11y-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 10px;
+  border-radius: 9px;
+  gap: 10px;
+  transition: background .12s;
+  cursor: default;
+}
+.a11y-row:hover {
+  background: var(--bg3);
+}
+.a11y-label {
+  font-size: 13px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+.a11y-label-icon {
+  font-size: 17px;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.a11y-label-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.a11y-label-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.2;
+}
+.a11y-label-desc {
+  font-size: 10px;
+  color: var(--text3);
+  line-height: 1.3;
+}
+
+/* ── Toggle switch acessível (WCAG 4.1.2) ── */
+.a11y-toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+.a11y-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+.a11y-toggle-track {
+  position: absolute;
+  inset: 0;
+  background: var(--bg4);
+  border: 1.5px solid var(--border2);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+}
+.a11y-toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text3);
+  transition: transform .2s, background .2s;
+}
+.a11y-toggle input:checked + .a11y-toggle-track {
+  background: var(--amber-g);
+  border-color: var(--amber-b);
+}
+.a11y-toggle input:checked + .a11y-toggle-track::after {
+  transform: translateX(20px);
+  background: var(--amber);
+}
+.a11y-toggle input:focus-visible + .a11y-toggle-track {
+  outline: 2px solid var(--amber2);
+  outline-offset: 2px;
+}
+
+/* ── Controle de tamanho de fonte ── */
+.a11y-font-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.a11y-font-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--sans);
+  transition: background .12s, color .12s;
+  font-weight: 700;
+  flex-shrink: 0;
+  user-select: none;
+}
+.a11y-font-btn:hover {
+  background: var(--bg4);
+  color: var(--amber);
+}
+.a11y-font-btn:focus-visible {
+  outline: 2px solid var(--amber2);
+  outline-offset: 2px;
+}
+.a11y-font-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.a11y-font-val {
+  font-size: 11px;
+  color: var(--amber);
+  font-family: var(--mono);
+  width: 30px;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Rodapé com atalhos de teclado */
+.a11y-panel-footer {
+  padding: 10px 16px 12px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+.a11y-hint {
+  font-size: 10px;
+  color: var(--text3);
+  line-height: 1.6;
+}
+.a11y-hint kbd {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text2);
+}
+/* Separador no painel */
+.a11y-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 8px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODOS DE ACESSIBILIDADE — IMPACTO MÁXIMO
+   ══════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────
+   1. ALTO CONTRASTE EXTREMO — preto puro + amarelo neon
+      Contraste texto/fundo > 15:1 (supera WCAG AAA de 7:1)
+   ───────────────────────────────────────────────────────────── */
+body.a11y-hc {
+  --bg:      #000000;
+  --bg2:     #000000;
+  --bg3:     #0d0d0d;
+  --bg4:     #1a1a1a;
+  --amber:   #ffe500;
+  --amber2:  #ffee44;
+  --amber-g: rgba(255,229,0,0.15);
+  --amber-b: rgba(255,229,0,0.7);
+  --teal:    #00ffff;
+  --teal-g:  rgba(0,255,255,0.12);
+  --red:     #ff4444;
+  --red-g:   rgba(255,68,68,0.15);
+  --green:   #00ff66;
+  --green-g: rgba(0,255,102,0.12);
+  --blue:    #44aaff;
+  --blue-g:  rgba(68,170,255,0.12);
+  --text:    #ffffff;
+  --text2:   #ffff00;
+  --text3:   #cccccc;
+  --border:  #ffffff;
+  --border2: #ffff00;
+  --mono:    'IBM Plex Mono', monospace;
+  --sans:    'IBM Plex Sans', sans-serif;
+}
+/* Bordas sólidas grossas em tudo */
+body.a11y-hc *,
+body.a11y-hc input,
+body.a11y-hc select,
+body.a11y-hc textarea {
+  border-color: rgba(255,255,255,0.5) !important;
+}
+body.a11y-hc .card,
+body.a11y-hc .fg,
+body.a11y-hc .fe-wrap,
+body.a11y-hc .bom-item,
+body.a11y-hc .modal,
+body.a11y-hc .confirm {
+  border: 2px solid #ffffff !important;
+}
+body.a11y-hc .btn,
+body.a11y-hc .btn-add,
+body.a11y-hc .btn-exp,
+body.a11y-hc .btn-imp,
+body.a11y-hc .btn-sv,
+body.a11y-hc .btn-rs,
+body.a11y-hc .a11y-font-btn {
+  border: 2px solid currentColor !important;
+  font-weight: 700 !important;
+}
+body.a11y-hc .nav-item { border: 1px solid rgba(255,255,255,0.2) !important; }
+body.a11y-hc .nav-item.active {
+  border: 2px solid var(--amber) !important;
+  border-left-width: 5px !important;
+  font-weight: 800 !important;
+}
+body.a11y-hc .tag {
+  border: 1.5px solid currentColor !important;
+  font-weight: 700 !important;
+}
+body.a11y-hc label, body.a11y-hc .lbl {
+  color: #ffff00 !important;
+  font-weight: 700 !important;
+}
+body.a11y-hc th {
+  background: #000 !important;
+  color: #ffff00 !important;
+  border-bottom: 2px solid #ffff00 !important;
+}
+body.a11y-hc tr:hover td { background: #1a1a00 !important; }
+body.a11y-hc .card-head { border-bottom: 2px solid rgba(255,255,255,0.3) !important; }
+body.a11y-hc .sb { border-right: 2px solid rgba(255,255,255,0.4) !important; }
+body.a11y-hc .topbar { border-bottom: 2px solid rgba(255,255,255,0.4) !important; }
+
+/* ─────────────────────────────────────────────────────────────
+   2. TAMANHO DE FONTE — até 200% (WCAG 1.4.4)
+      html font-size via rem cascata para toda a página
+   ───────────────────────────────────────────────────────────── */
+body.a11y-f1 { font-size: 112% !important; }
+body.a11y-f2 { font-size: 130% !important; }
+body.a11y-f3 { font-size: 155% !important; }
+body.a11y-f4 { font-size: 185% !important; }
+body.a11y-f5 { font-size: 200% !important; }
+
+/* Em 200%, o sidebar fica largura automática */
+body.a11y-f4 { --sw: 300px; }
+body.a11y-f5 { --sw: 320px; }
+
+/* ─────────────────────────────────────────────────────────────
+   3. ESPAÇAMENTO MÁXIMO — WCAG 1.4.12 (texto não cortado)
+      Linha: 2.2× | Letras: 0.15em | Palavras: 0.25em
+   ───────────────────────────────────────────────────────────── */
+body.a11y-space {
+  line-height: 2.2 !important;
+  letter-spacing: 0.12em !important;
+  word-spacing: 0.22em !important;
+}
+body.a11y-space p,
+body.a11y-space li,
+body.a11y-space td,
+body.a11y-space th,
+body.a11y-space label,
+body.a11y-space .lbl,
+body.a11y-space .hint,
+body.a11y-space .mod-desc,
+body.a11y-space .confirm-msg {
+  line-height: 2.2 !important;
+  letter-spacing: 0.12em !important;
+}
+body.a11y-space .nav-item  { padding-top: 16px !important; padding-bottom: 16px !important; gap: 14px !important; }
+body.a11y-space .fg        { gap: 16px !important; padding: 20px !important; }
+body.a11y-space .card-head { padding: 20px 24px !important; }
+body.a11y-space .card-body { padding: 22px !important; }
+body.a11y-space td, body.a11y-space th { padding: 18px 20px !important; }
+body.a11y-space label, body.a11y-space .lbl { margin-bottom: 8px !important; display: block; }
+body.a11y-space .mod-head  { margin-bottom: 36px !important; }
+body.a11y-space .mod-title { margin-bottom: 10px !important; }
+body.a11y-space .bom-item  { padding: 16px 18px !important; margin: 12px 0 !important; }
+body.a11y-space .fe-wrap   { padding: 24px !important; }
+body.a11y-space .btn,
+body.a11y-space .btn-add   { padding: 14px 24px !important; }
+body.a11y-space .sb-section { padding-top: 20px !important; padding-bottom: 8px !important; }
+
+/* ─────────────────────────────────────────────────────────────
+   4. FOCO EXTREMO — indicador inconfundível
+      Anel triplo: branco + âmbar + halo difuso
+   ───────────────────────────────────────────────────────────── */
+body.a11y-focus :focus-visible {
+  outline: 4px solid #ffe500 !important;
+  outline-offset: 5px !important;
+  box-shadow:
+    0 0 0 2px #000,
+    0 0 0 6px #ffe500,
+    0 0 0 10px rgba(255,229,0,.3),
+    0 0 20px rgba(255,229,0,.4) !important;
+  border-radius: 4px !important;
+  z-index: 9999 !important;
+  position: relative;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   5. MODO LEITURA — interface simplificada ao máximo
+      Remove todas distrac̃ões, maximiza legibilidade
+   ───────────────────────────────────────────────────────────── */
+body.a11y-read {
+  --bg:  #111111;
+  --bg2: #111111;
+  --bg3: #1a1a1a;
+  --bg4: #222222;
+  --text:  #f5f5f5;
+  --text2: #cccccc;
+  --text3: #999999;
+  --border:  rgba(255,255,255,0.15);
+  --border2: rgba(255,255,255,0.25);
+}
+/* Remove todas as decorações visuais */
+body.a11y-read *::before,
+body.a11y-read *::after            { display: none !important; }
+body.a11y-read .tipo-card::before  { display: none !important; }
+body.a11y-read * {
+  background-image: none !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  border-radius: 4px !important;
+}
+/* Cards com bordas claras, sem gradientes */
+body.a11y-read .card,
+body.a11y-read .fg,
+body.a11y-read .fe-wrap,
+body.a11y-read .bom-item {
+  border: 2px solid rgba(255,255,255,0.2) !important;
+}
+/* Tags sem cores — só bordas */
+body.a11y-read .tag,
+body.a11y-read .tag-amber,
+body.a11y-read .tag-teal,
+body.a11y-read .tag-red,
+body.a11y-read .tag-green {
+  background: transparent !important;
+  color: var(--text) !important;
+  border: 1.5px solid currentColor !important;
+}
+/* Botões sem gradientes */
+body.a11y-read .btn-primary { background: var(--amber) !important; }
+body.a11y-read .nav-item.active {
+  background: rgba(255,255,255,0.08) !important;
+  border-left: 4px solid var(--text) !important;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+/* Ícones/emojis ocultos para não distrair leitores de tela */
+body.a11y-read .ni,
+body.a11y-read .empty-icon,
+body.a11y-read .sb-logo-icon { opacity: 0.4; }
+
+/* ─────────────────────────────────────────────────────────────
+   6. ALVOS DE TOQUE GIGANTES — mínimo 60×60 px
+      WCAG 2.5.5 exige 44×44; vai além para baixa destreza
+   ───────────────────────────────────────────────────────────── */
+body.a11y-touch .btn,
+body.a11y-touch .btn-add,
+body.a11y-touch .btn-exp,
+body.a11y-touch .btn-imp,
+body.a11y-touch .btn-sv,
+body.a11y-touch .btn-rs {
+  min-height: 60px !important;
+  min-width: 60px !important;
+  padding: 14px 28px !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.03em !important;
+}
+body.a11y-touch .nav-item {
+  min-height: 60px !important;
+  font-size: 16px !important;
+  padding: 14px 18px !important;
+  gap: 14px !important;
+}
+body.a11y-touch .nav-item .ni { font-size: 20px !important; }
+body.a11y-touch .modal-close,
+body.a11y-touch .btn-rm {
+  width: 52px !important;
+  height: 52px !important;
+  font-size: 20px !important;
+  border-radius: 8px !important;
+}
+body.a11y-touch input,
+body.a11y-touch select,
+body.a11y-touch textarea {
+  min-height: 52px !important;
+  font-size: 17px !important;
+  padding: 12px 16px !important;
+}
+body.a11y-touch .card-head { padding: 20px 24px !important; }
+body.a11y-touch .a11y-font-btn {
+  width: 48px !important;
+  height: 48px !important;
+  font-size: 18px !important;
+}
+body.a11y-touch .ei {
+  min-height: 44px !important;
+  font-size: 15px !important;
+  padding: 8px 12px !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   7. REDUZIR MOVIMENTO — sem qualquer transição ou animação
+   ───────────────────────────────────────────────────────────── */
+body.a11y-motion *,
+body.a11y-motion *::before,
+body.a11y-motion *::after {
+  transition-duration: 0ms !important;
+  transition-delay: 0ms !important;
+  animation-duration: 0ms !important;
+  animation-delay: 0ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   8. PREFERÊNCIAS AUTOMÁTICAS DO SISTEMA OPERACIONAL
+   ───────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+@media (prefers-contrast: more) {
+  :root {
+    --text:    #ffffff;
+    --text2:   #eeeeee;
+    --border:  rgba(255,255,255,0.4);
+    --border2: rgba(255,255,255,0.7);
+    --amber:   #ffe500;
+    --teal:    #00ffff;
+    --green:   #00ff66;
+  }
+  input, select, textarea { border-width: 2px !important; }
+  .btn, .btn-add, .btn-sv { border-width: 2px !important; }
+  label, .lbl { font-weight: 700 !important; }
+}
+@media (forced-colors: active) {
+  .a11y-btn { forced-color-adjust: none; }
+  :focus-visible { outline: 3px solid ButtonText !important; }
+}
+</style>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Pular para o conteúdo principal</a>
+
+<aside class="sb" id="sb" aria-label="Menu de navegação principal" role="complementary">
+  <div class="sb-logo">
+    <div class="sb-logo-icon" aria-hidden="true">⚙</div>
+    <div>
+      <div class="sb-logo-name">FSX</div>
+      <div class="sb-logo-sub">SOFTWARE DEVELOPMENT</div>
+    </div>
+    <button class="sb-close" id="sbClose" aria-label="Fechar menu">✕</button>
+  </div>
+  <nav class="sb-nav" id="sbNav" aria-label="Navegação"></nav>
+  <div class="sb-foot">
+    <button class="btn-exp" id="btnExport" aria-label="Exportar dados em JSON">↓ Exportar JSON</button>
+    <button class="btn-imp" id="btnImportTrig" aria-label="Importar dados de arquivo JSON">↑ Importar JSON</button>
+    <input type="file" id="fileImport" accept=".json" style="display:none" aria-label="Arquivo JSON para importar">
+  </div>
+</aside>
+
+<div class="overlay" id="overlay" aria-hidden="true"></div>
+
+<main class="main" id="main-content" role="main">
+  <header class="topbar" role="banner">
+    <button class="hbg" id="hbg" aria-label="Abrir menu" aria-expanded="false">☰</button>
+    <div class="topbar-title" id="topTitle" aria-live="polite">Sistema</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-sv" id="btnSave" aria-label="Salvar todos os dados">💾 Salvar</button>
+      <button class="btn-rs" id="btnReset" aria-label="Resetar para dados padrão">↺ Reset</button>
+    </div>
+  </header>
+  <div class="content" id="content" role="region" aria-label="Conteúdo principal"></div>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<!-- ══ PAINEL DE ACESSIBILIDADE PCD (WCAG 2.1 AA) ══ -->
+<div id="a11y-announce" aria-live="assertive" aria-atomic="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;"></div>
+
+<button
+  class="a11y-btn"
+  id="a11yBtn"
+  aria-label="Abrir painel de acessibilidade"
+  aria-expanded="false"
+  aria-controls="a11yPanel"
+  aria-haspopup="dialog"
+  title="Opções de acessibilidade visual (Alt+A)"
+>
+  <span aria-hidden="true">♿</span>
+  <span class="a11y-active-dot" aria-hidden="true"></span>
+</button>
+
+<div
+  class="a11y-panel"
+  id="a11yPanel"
+  role="dialog"
+  aria-modal="false"
+  aria-label="Painel de acessibilidade visual"
+  aria-describedby="a11yPanelDesc"
+>
+  <div class="a11y-panel-header">
+    <span class="a11y-panel-header-icon" aria-hidden="true">♿</span>
+    <div class="a11y-panel-header-text">
+      <span class="a11y-panel-title">Acessibilidade</span>
+      <span class="a11y-panel-subtitle" id="a11yPanelDesc">Ajustes visuais para deficiência visual</span>
+    </div>
+    <button class="a11y-panel-close" id="a11yClose" aria-label="Fechar painel de acessibilidade">✕</button>
+  </div>
+
+  <div class="a11y-panel-body">
+
+    <!-- PERCEPÇÃO VISUAL -->
+    <div class="a11y-section-label" aria-hidden="true">👁 Percepção Visual</div>
+
+    <!-- Alto contraste extremo -->
+    <div class="a11y-row">
+      <label class="a11y-label" for="togHC">
+        <span class="a11y-label-icon" aria-hidden="true">◑</span>
+        <span class="a11y-label-text">
+          <span class="a11y-label-name">Alto contraste extremo</span>
+          <span class="a11y-label-desc">Preto + amarelo neon · contraste &gt;15:1</span>
+        </span>
+      </label>
+      <label class="a11y-toggle">
+        <input type="checkbox" id="togHC" role="switch" aria-checked="false">
+        <span class="a11y-toggle-track"></span>
+      </label>
+    </div>
+
+    <!-- Modo leitura -->
+    <div class="a11y-row">
+      <label class="a11y-label" for="togRead">
+        <span class="a11y-label-icon" aria-hidden="true">📄</span>
+        <span class="a11y-label-text">
+          <span class="a11y-label-name">Modo leitura</span>
+          <span class="a11y-label-desc">Remove decorações · interface limpa</span>
+        </span>
+      </label>
+      <label class="a11y-toggle">
+        <input type="checkbox" id="togRead" role="switch" aria-checked="false">
+        <span class="a11y-toggle-track"></span>
+      </label>
+    </div>
+
+    <!-- Tamanho da fonte -->
+    <div class="a11y-row">
+      <span class="a11y-label" id="fontSizeLabel">
+        <span class="a11y-label-icon" aria-hidden="true">🔤</span>
+        <span class="a11y-label-text">
+          <span class="a11y-label-name">Tamanho da fonte</span>
+          <span class="a11y-label-desc" id="fontSizeDesc">Normal (100%)</span>
+        </span>
+      </span>
+      <div class="a11y-font-ctrl" role="group" aria-labelledby="fontSizeLabel">
+        <button class="a11y-font-btn" id="fontDec" aria-label="Diminuir fonte">A−</button>
+        <span class="a11y-font-val" id="fontVal" aria-live="polite">100%</span>
+        <button class="a11y-font-btn" id="fontInc" aria-label="Aumentar fonte">A+</button>
+      </div>
+    </div>
+
+    <div class="a11y-divider" aria-hidden="true"></div>
+
+    <!-- LEITURA -->
+    <div class="a11y-section-label" aria-hidden="true">📖 Leitura</div>
+
+    <!-- Espaçamento máximo -->
+    <div class="a11y-row">
+      <label class="a11y-label" for="togSpace">
+        <span class="a11y-label-icon" aria-hidden="true">↕</span>
+        <span class="a11y-label-text">
+          <span class="a11y-label-name">Espaçamento máximo</span>
+          <span class="a11y-label-desc">Linha 2.2× · letras 0.12em · palavras 0.22em</span>
+        </span>
+      </label>
+      <label class="a11y-toggle">
+        <input type="checkbox" id="togSpace" role="switch" aria-checked="false">
+        <span class="a11y-toggle-track"></span>
+      </label>
+    </div>
+
+    <div class="a11y-divider" aria-hidden="true"></div>
+
+    <!-- OPERAÇÃO -->
+    <div class="a11y-section-label" aria-hidden="true">🖱 Operação</div>
+
+    <!-- Foco extremo -->
+    <div class="a11y-row">
+      <label class="a11y-label" for="togFocus">
+        <span class="a11y-label-icon" aria-hidden="true">🎯</span>
+        <span class="a11y-label-text">
+          <span class="a11y-label-name">Foco extremo</span>
+          <span class="a11y-label-desc">Anel triplo âmbar · halo luminoso</span>
+        </span>
+      </label>
+      <label class="a11y-toggle">
+        <input type="checkbox" id="togFocus" role="switch" aria-checked="false">
+        <span class="a11y-toggle-track"></span>
+      </label>
+    </div>
+
+    <!-- Alvos gigantes -->
+    <div class="a11y-row">
+      <label class="a11y-label" for="togTouch">
+        <span class="a11y-label-icon" aria-hidden="true">👆</span>
+        <span class="a11y-label-text">
+          <span class="a11y-label-name">Alvos de toque gigantes</span>
+          <span class="a11y-label-desc">Botões e inputs mínimo 60×60 px</span>
+        </span>
+      </label>
+      <label class="a11y-toggle">
+        <input type="checkbox" id="togTouch" role="switch" aria-checked="false">
+        <span class="a11y-toggle-track"></span>
+      </label>
+    </div>
+
+    <!-- Reduzir animações -->
+    <div class="a11y-row">
+      <label class="a11y-label" for="togMotion">
+        <span class="a11y-label-icon" aria-hidden="true">⏸</span>
+        <span class="a11y-label-text">
+          <span class="a11y-label-name">Parar animações</span>
+          <span class="a11y-label-desc">Remove toda transição e movimento</span>
+        </span>
+      </label>
+      <label class="a11y-toggle">
+        <input type="checkbox" id="togMotion" role="switch" aria-checked="false">
+        <span class="a11y-toggle-track"></span>
+      </label>
+    </div>
+
+  </div>
+
+  <div class="a11y-panel-footer">
+    <p class="a11y-hint">
+      <kbd>Alt</kbd>+<kbd>A</kbd> abre/fecha · <kbd>Esc</kbd> fecha · preferências salvas automaticamente.
+    </p>
+  </div>
+</div>
+
+<div class="confirm-bg" id="confirmBg" role="dialog" aria-modal="true" aria-labelledby="confirmMsg" aria-hidden="true">
+  <div class="confirm">
+    <div class="confirm-msg" id="confirmMsg"></div>
+    <div class="confirm-acts">
+      <button class="btn btn-ghost" id="confirmNo">Cancelar</button>
+      <button class="btn btn-danger" id="confirmYes">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════════
+// DADOS REAIS (importados do Excel Mistura 90 - i9 TMG)
+// ═══════════════════════════════════════════════════════════════
+const DEFAULT = {
+  constantes: {
+    CF1: 0.754, CF2: 1, n_fileiras: 1, passo_mm: 310,
+    D_tambor: 0.62, rendimento: 0.95, largura_correia_mm: 559.8,
+    Ho_centrifugo: 7, Ho_continuo: 2, k_esticador: 0.85,
+    Tu_lona: 33, pi: 3.1415
+  },
+  tipos: {
+    elevador: {
+      id:'elevador', nome:'Elevador de Canecas',
+      parametros:[
+        {nome:'capacidade',  label:'Capacidade (t/h)',      tipo:'number', default:177, unidade:'t/h'},
+        {nome:'altura',      label:'Altura C/C (m)',         tipo:'number', default:20.6, unidade:'m'},
+        {nome:'densidade',   label:'Densidade do material (t/m³)', tipo:'number', default:1.11, unidade:'t/m³'},
+        {nome:'velocidade',  label:'Velocidade da correia (m/s)', tipo:'number', default:1.525, unidade:'m/s'},
+        {nome:'vol_caneca',  label:'Volume da caneca 75% (L)', tipo:'number', default:9.04, unidade:'L'}
+      ],
+      formulas:{
+        Pm:           '(1000 * n_fileiras * densidade * vol_caneca) / passo_mm',
+        correia_aberta_m: 'pi * D_tambor + 2 * altura',
+        num_canecas:  '(1000 * correia_aberta_m * n_fileiras) / passo_mm',
+        Te_canecas:   '0.8 * (vol_caneca * densidade) * num_canecas * (altura + Ho_centrifugo) / altura',
+        Tm_kgf:       '(1 + k_esticador) * Te_canecas',
+        lonas_calc:   'Tm_kgf / (largura_correia_mm / 10) / Tu_lona',
+        lonas_min:    'Math.ceil(lonas_calc)',
+        potencia_cv:  '(velocidade * Pm * n_fileiras * (altura + 7 * D_tambor)) / (75 * rendimento)'
+      }
+    },
+    transportador: {
+      id:'transportador', nome:'Transportador de Correia',
+      parametros:[
+        {nome:'capacidade',   label:'Capacidade (t/h)',       tipo:'number', default:152, unidade:'t/h'},
+        {nome:'comprimento',  label:'Comprimento (m)',         tipo:'number', default:14, unidade:'m'},
+        {nome:'densidade',    label:'Densidade (t/m³)',        tipo:'number', default:1.2, unidade:'t/m³'},
+        {nome:'velocidade',   label:'Velocidade correia (m/s)', tipo:'number', default:0.542, unidade:'m/s'},
+        {nome:'largura_pol',  label:'Largura correia (pol)',   tipo:'number', default:30, unidade:'pol'},
+        {nome:'inclinacao',   label:'Inclinação (graus)',      tipo:'number', default:0, unidade:'°'}
+      ],
+      formulas:{
+        Wm:           '0.277 * capacidade / velocidade',
+        B_mm:         'largura_pol * 25.4',
+        S_transversal:'0.065',
+        Te_N:         'Wm * 9.81 * comprimento * 0.04',
+        potencia_cv:  '(Te_N * velocidade) / (1000 * 0.7355) * 1.15'
+      }
+    },
+    peneira: {
+      id:'peneira', nome:'Peneira Rotativa',
+      parametros:[
+        {nome:'alimentacao',  label:'Alimentação (m³/h)',     tipo:'number', default:160, unidade:'m³/h'},
+        {nome:'densidade',    label:'Densidade (t/m³)',        tipo:'number', default:1.0, unidade:'t/m³'},
+        {nome:'diametro',     label:'Diâmetro da peneira (m)', tipo:'number', default:1.25, unidade:'m'},
+        {nome:'comprimento',  label:'Comprimento da peneira (m)', tipo:'number', default:2.9, unidade:'m'},
+        {nome:'abertura_tela',label:'Abertura da malha (mm)', tipo:'number', default:10, unidade:'mm'},
+        {nome:'cap_unit',     label:'Capacidade unitária da tela (m³/h·m²)', tipo:'number', default:21, unidade:'m³/h·m²'}
+      ],
+      formulas:{
+        vazao_tonh:      'alimentacao * densidade',
+        area_necessaria: 'alimentacao / cap_unit',
+        area_selecionada:'diametro * Math.PI * comprimento',
+        fator_seguranca: 'area_selecionada / area_necessaria',
+        Rc_rpm:          '42.2 / Math.sqrt(diametro)',
+        Ra_otimizada:    '0.40 * Rc_rpm',
+        potencia_cv:     'area_necessaria * 1.5 + 1'
+      }
+    },
+    moinho: {
+      id:'moinho', nome:'Moinho (Bond)',
+      parametros:[
+        {nome:'taxa',  label:'Taxa de alimentação (t/h)', tipo:'number', default:10, unidade:'t/h'},
+        {nome:'wi',    label:'Índice de Bond Wi (kWh/ST)', tipo:'number', default:11.6, unidade:'kWh/ST'},
+        {nome:'d1',    label:'P80 produto (µm)',           tipo:'number', default:5000, unidade:'µm'},
+        {nome:'d0',    label:'F80 alimentação (µm)',       tipo:'number', default:35000, unidade:'µm'}
+      ],
+      formulas:{
+        energia_kWh_t: 'wi * 10 * (1/Math.sqrt(d1) - 1/Math.sqrt(d0))',
+        potencia_kW:   'energia_kWh_t * taxa',
+        potencia_cv:   'potencia_kW / 0.7355'
+      }
+    }
+  },
+  equipamentos: {
+    'EL-001': {
+      id:'EL-001', nome:'Elevador EL-001 (Mistura 90)', tipo:'elevador',
+      parametros_salvos:{capacidade:177.7,altura:20.6,densidade:1.11,velocidade:1.525,vol_caneca:9.04},
+      criado_em:'2024-01-01',
+      componentes:[
+        {id:'c1', nome:'Motorredutor', qtd:1, descricao:'V 10 2 1:37,26 BGA 180M 30HP 4P 60Hz P3 B5 IP65 DISCO RECUO LIVRE AH fs1,79', subcomponentes:[]},
+        {id:'c2', nome:'Correia elevadora', qtd:46, descricao:'22" 4PN3000 REVEST 1/8"x1/8" NBR REAÇÃO', subcomponentes:[]},
+        {id:'c3', nome:'Mancal Motriz', qtd:2, descricao:'SNH 526 TSN L rol Ø115 22226 EK H3126 2 FRB 13/230', subcomponentes:[]},
+        {id:'c4', nome:'Mancal Esticador', qtd:2, descricao:'SNH 516 TSN L rol Ø70 22216EK H316 2 FRB 12.5/140', subcomponentes:[]},
+        {id:'c5', nome:'Tambor Motriz', qtd:1, descricao:'Ø620mm Comp 710mm Ranhurado V 30x5 abaulado 6mm Borracha Nitílica 13mm', subcomponentes:[]},
+        {id:'c6', nome:'Tambor Esticador', qtd:1, descricao:'Ø550mm Comp 710mm Gaiola com Cone', subcomponentes:[]},
+        {id:'c7', nome:'Eixo Motriz', qtd:1, descricao:'Ø140mm 1780mm SAE 4140', subcomponentes:[]},
+        {id:'c8', nome:'Eixo Esticador', qtd:1, descricao:'Ø89mm 1650mm SAE 1045', subcomponentes:[]},
+        {id:'c9', nome:'Canecas', qtd:104, descricao:'Centrífugas chapa 3/16 550x220x230 passo 430mm', subcomponentes:[
+          {id:'c9a', nome:'Parafusos fixação', qtd:312, descricao:'M12 x 25mm Gr8.8', subcomponentes:[]},
+          {id:'c9b', nome:'Porcas', qtd:312, descricao:'M12 Gr8.8', subcomponentes:[]}
+        ]}
+      ]
+    },
+    'EL-002': {
+      id:'EL-002', nome:'Elevador EL-002 (Mistura 90)', tipo:'elevador',
+      parametros_salvos:{},
+      criado_em:'2024-01-01',
+      componentes:[
+        {id:'e2c1', nome:'Motorredutor', qtd:1, descricao:'V 10 2 1:37,26 BGA 180M 30HP 4P 60Hz P3 B5 IP65 DISCO RECUO LIVRE H fs1,79', subcomponentes:[]},
+        {id:'e2c2', nome:'Correia elevadora', qtd:45, descricao:'22" 4PN3000 REVEST 1/8"x1/8" NBR REAÇÃO', subcomponentes:[]},
+        {id:'e2c3', nome:'Mancal Motriz', qtd:2, descricao:'SNH 526 TSN L rol Ø115 22226 EK H3126 2 FRB 13/230', subcomponentes:[]},
+        {id:'e2c4', nome:'Mancal Esticador', qtd:2, descricao:'SNH 516 TSN L rol Ø70 22216EK H316 2 FRB 12.5/140', subcomponentes:[]},
+        {id:'e2c5', nome:'Tambor Motriz', qtd:1, descricao:'Ø620mm Comp 610mm Ranhurado V 30x5 abaulado 6mm Borracha Nitílica 13mm', subcomponentes:[]},
+        {id:'e2c6', nome:'Tambor Esticador', qtd:1, descricao:'Ø550mm Comp 610mm Gaiola com Cone', subcomponentes:[]},
+        {id:'e2c7', nome:'Eixo Motriz', qtd:1, descricao:'Ø127mm 1500mm SAE 4140', subcomponentes:[]},
+        {id:'e2c8', nome:'Eixo Esticador', qtd:1, descricao:'Ø89mm 1000mm SAE 1045', subcomponentes:[]},
+        {id:'e2c9', nome:'Canecas', qtd:102, descricao:'Centrífugas chapa 3/16 450x220x230 passo 430mm', subcomponentes:[]}
+      ]
+    },
+    'PN-001': {
+      id:'PN-001', nome:'Peneira PN-001 (Rotativa)', tipo:'peneira',
+      parametros_salvos:{alimentacao:160,densidade:1,diametro:1.25,comprimento:2.9,abertura_tela:10,cap_unit:21},
+      criado_em:'2024-01-01',
+      componentes:[
+        {id:'p1c1', nome:'Motorredutor', qtd:1, descricao:'N 09 3 1:109,7 BGA 112M 6HP 4P 60Hz P1 B5D/B14D IP65 DISCO fs 1,75', subcomponentes:[]},
+        {id:'p1c2', nome:'Mancal', qtd:2, descricao:'SNH 516 TSN L rol Ø70 2216K H316 2 FRB 12.5/140', subcomponentes:[]},
+        {id:'p1c3', nome:'Gaiola da Peneira', qtd:1, descricao:'Ø1250mm Comp 3000mm', subcomponentes:[]},
+        {id:'p1c4', nome:'Tubo da Gaiola', qtd:1, descricao:'Ø 6" SCH 80 Comp 3200mm ASTM A-53', subcomponentes:[]},
+        {id:'p1c5', nome:'Eixo Motriz', qtd:1, descricao:'Ø140mm 1000mm SAE 1045', subcomponentes:[]},
+        {id:'p1c6', nome:'Eixo Movido', qtd:1, descricao:'Ø140mm 600mm SAE 1046', subcomponentes:[]},
+        {id:'p1c7', nome:'Telas', qtd:6, descricao:'INOX 304 aberturas 15x10mm fio 3,2mm módulos 1000x2000mm com moldura', subcomponentes:[]}
+      ]
+    },
+    'PN-002': {
+      id:'PN-002', nome:'Peneira PN-002 (Rotativa)', tipo:'peneira',
+      parametros_salvos:{},
+      criado_em:'2024-01-01',
+      componentes:[
+        {id:'p2c1', nome:'Motorredutor', qtd:1, descricao:'N 09 3 1:94,9 BGA 112M 5HP 4P 60Hz P1 B5D/B14D IP65 DISCO fs 1,75', subcomponentes:[]},
+        {id:'p2c2', nome:'Mancal', qtd:2, descricao:'SNH 515 TSN L rol Ø65 2215K H315 2 FRB 12.5/130', subcomponentes:[]},
+        {id:'p2c3', nome:'Gaiola da Peneira', qtd:1, descricao:'Ø1120mm Comp 2800mm', subcomponentes:[]},
+        {id:'p2c4', nome:'Tubo da Gaiola', qtd:1, descricao:'Ø 5" SCH 80 Comp 3000mm ASTM A-53', subcomponentes:[]},
+        {id:'p2c5', nome:'Telas', qtd:6, descricao:'INOX 304 aberturas 15x10mm fio 3,2mm módulos 930x1800mm com moldura', subcomponentes:[]}
+      ]
+    },
+    'TP-001': {
+      id:'TP-001', nome:'Transportador TP-001 30"', tipo:'transportador',
+      parametros_salvos:{capacidade:152,comprimento:14,densidade:1.2,velocidade:0.542,largura_pol:30},
+      criado_em:'2024-01-01',
+      componentes:[
+        {id:'t1c1', nome:'Motorredutor', qtd:1, descricao:'N 06 3 1:58,89 BGA 90S 2HP 4P 60Hz B5D/B14D DISCO SAÍDA LADO 1 P3 A1 fs 1,7', subcomponentes:[]},
+        {id:'t1c2', nome:'Correia', qtd:14, descricao:'30" 2PN2200 REVEST 3/16"x1/16" SBR CORRUGADA (metros)', subcomponentes:[]},
+        {id:'t1c3', nome:'Mancal Motriz', qtd:2, descricao:'SNH 515 TSN L rol Ø65 2215K H315 2 FRB 12.5/130', subcomponentes:[]},
+        {id:'t1c4', nome:'Mancal Esticador', qtd:2, descricao:'SNH 512 TSN L rol Ø55 2212K H312 2 FRB 10/110', subcomponentes:[]},
+        {id:'t1c5', nome:'Tambor Motriz', qtd:1, descricao:'Ø323mm Comp 870mm Ranhurado V 30x5 abaulado 6mm Borracha Nitílica 13mm', subcomponentes:[]},
+        {id:'t1c6', nome:'Tambor Esticador', qtd:1, descricao:'Ø323mm Comp 870mm Liso abaulado 6mm Borracha Nitílica 13mm', subcomponentes:[]},
+        {id:'t1c7', nome:'Roletes de Retorno', qtd:15, descricao:'Ø102 Kanaflex Azul Corpo 837mm eixo Ø20x871mm rol 6204 vedação p/ fertilizantes', subcomponentes:[]}
+      ]
+    },
+    'TP-002': {
+      id:'TP-002', nome:'Transportador TP-002 30"', tipo:'transportador',
+      parametros_salvos:{},
+      criado_em:'2024-01-01',
+      componentes:[
+        {id:'t2c1', nome:'Motorredutor', qtd:1, descricao:'N 06 3 1:58,89 BGA 90S 2HP 4P 60Hz B5D/B14D DISCO SAÍDA LADO 1 P1 A1 fs 1,7', subcomponentes:[]},
+        {id:'t2c2', nome:'Correia', qtd:8, descricao:'30" 2PN2200 REVEST 3/16"x1/16" SBR CORRUGADA (metros)', subcomponentes:[]},
+        {id:'t2c3', nome:'Roletes de Retorno', qtd:8, descricao:'Ø102 Kanaflex Azul Corpo 837mm eixo Ø20x871mm rol 6204', subcomponentes:[]}
+      ]
+    },
+    'TP-003': {
+      id:'TP-003', nome:'Transportador TP-003', tipo:'transportador',
+      parametros_salvos:{},
+      criado_em:'2024-01-01',
+      componentes:[
+        {id:'t3c1', nome:'Motorredutor', qtd:1, descricao:'N 07 3 1:61,25 BGA 90L 3HP 4P 60Hz B5D/B14D DISCO SAÍDA LADO 1 P1 A1 fs 2,11', subcomponentes:[]}
+      ]
+    },
+    'MO-001': {
+      id:'MO-001', nome:'Moinho MO-001', tipo:'moinho',
+      parametros_salvos:{},
+      criado_em:'2024-01-01',
+      componentes:[
+        {id:'m1c1', nome:'Motor Elétrico', qtd:1, descricao:'WEG W22 IR3 Premium 15CV 4P 132M 3F 220/380/440V 60Hz CX LIG DIR IP65 B3E', subcomponentes:[]},
+        {id:'m1c2', nome:'Mancal', qtd:2, descricao:'SNH 515 TSN L rol Ø65 22215EK H315 2 FRB 12.5/130', subcomponentes:[]},
+        {id:'m1c3', nome:'Polia Motor', qtd:1, descricao:'Polia em V 3 canais tipo B Ø250mm', subcomponentes:[]},
+        {id:'m1c4', nome:'Polia Máquina', qtd:1, descricao:'Polia em V 3 canais tipo B Ø200mm', subcomponentes:[]}
+      ]
+    }
+  },
+  prox_comp: 200
+};
+
+const KEY = 'mistura90_v3';
+let DATA = load();
+function load(){try{const r=localStorage.getItem(KEY);if(r)return JSON.parse(r);}catch{}return JSON.parse(JSON.stringify(DEFAULT));}
+function save(){localStorage.setItem(KEY,JSON.stringify(DATA));}
+
+let curMod = 'equipamentos';
+let curExtra = null;
+let confirmCb = null;
+let previousFocus = null;
+
+// ═══ UTILS ═══════════════════════════════════════════════════
+function toast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+(type||'ok');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.className='toast',3200);
+}
+function confirm_(msg,cb){
+  document.getElementById('confirmMsg').textContent=msg;
+  const bg=document.getElementById('confirmBg');
+  bg.classList.add('show');
+  bg.setAttribute('aria-hidden','false');
+  previousFocus = document.activeElement;
+  const confirmYes = document.getElementById('confirmYes');
+  confirmYes.focus();
+  confirmCb=cb;
+}
+function closeConfirm(){
+  const bg=document.getElementById('confirmBg');
+  bg.classList.remove('show');
+  bg.setAttribute('aria-hidden','true');
+  if(previousFocus) previousFocus.focus();
+  confirmCb=null;
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function rnd(v,d){return Math.round(v*Math.pow(10,d))/Math.pow(10,d);}
+function newId(){DATA.prox_comp=(DATA.prox_comp||200)+1;return 'c'+DATA.prox_comp;}
+function genEquipId(tipo){
+  const p=tipo.slice(0,2).toUpperCase();
+  let mx=0;
+  for(let k of Object.keys(DATA.equipamentos))
+    if(k.startsWith(p))mx=Math.max(mx,parseInt(k.split('-')[1])||0);
+  return `${p}-${(mx+1).toString().padStart(3,'0')}`;
+}
+function closeSb(){document.getElementById('sb').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
+
+// ═══ FÓRMULA — ANÁLISE ═══════════════════════════════════════
+const JS_KW = new Set(['Math','sqrt','ceil','floor','abs','round','pow','min','max','log','PI','if','return','true','false','null','undefined']);
+function extractVars(expr){
+  const tokens=(expr.match(/[a-zA-Z_][a-zA-Z0-9_]*/g)||[]);
+  return [...new Set(tokens.filter(t=>!JS_KW.has(t)))];
+}
+function prettify(expr){
+  return expr.replace(/\*/g,'×').replace(/\bMath\.sqrt\(([^)]+)\)/g,'√($1)')
+    .replace(/\bMath\.ceil\(([^)]+)\)/g,'⌈$1⌉').replace(/\bMath\.floor\(([^)]+)\)/g,'⌊$1⌋')
+    .replace(/\bMath\.PI\b/g,'π').replace(/\bMath\.abs\(/g,'|').replace(/\bMath\.pow\(([^,]+),([^)]+)\)/g,'($1)^($2)');
+}
+
+// ═══ MENU ════════════════════════════════════════════════════
+function buildMenu(){
+  const nav=document.getElementById('sbNav');
+  let h='';
+  h+=`<div class="sb-section">Equipamentos</div>`;
+  h+=`<button class="nav-item" data-m="equipamentos" aria-label="Meus Equipamentos"><span class="ni" aria-hidden="true">🏭</span>Meus Equipamentos</button>`;
+  h+=`<div class="sb-section">Configuradores</div>`;
+  for(const[id,t] of Object.entries(DATA.tipos)){
+    h+=`<button class="nav-item" data-m="conf" data-e="${id}" aria-label="Configurar ${t.nome}"><span class="ni" aria-hidden="true">⚙️</span>${esc(t.nome)}</button>`;
+  }
+  h+=`<div class="sb-section">Administração</div>`;
+  h+=`<button class="nav-item" data-m="tipos" aria-label="Gerenciar Tipos de Equipamento"><span class="ni" aria-hidden="true">📐</span>Gerenciar Tipos</button>`;
+  h+=`<button class="nav-item" data-m="const" aria-label="Constantes Globais"><span class="ni" aria-hidden="true">🔧</span>Constantes Globais</button>`;
+  nav.innerHTML=h;
+  nav.querySelectorAll('[data-m]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      navigate(el.dataset.m, el.dataset.e||null);
+    });
+  });
+}
+
+function navigate(mod,extra){
+  curMod=mod; curExtra=extra||null;
+  const titles={
+    equipamentos:'Meus Equipamentos',
+    conf: extra?`Configurador — ${DATA.tipos[extra]?.nome||extra}`:'Configurador',
+    tipos:'Gerenciar Tipos',
+    const:'Constantes Globais'
+  };
+  const el=document.getElementById('topTitle');
+  el.textContent=titles[mod]||mod;
+  renderContent();
+  closeSb();
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const sel=document.querySelector(`[data-m="${mod}"]${extra?`[data-e="${extra}"]`:':not([data-e])'}`);
+  if(sel)sel.classList.add('active');
+}
+
+function renderContent(){
+  const c=document.getElementById('content');
+  c.innerHTML='';
+  if(curMod==='equipamentos') renderEquip(c);
+  else if(curMod==='conf') renderConf(c);
+  else if(curMod==='tipos') renderTipos(c);
+  else if(curMod==='const') renderConst(c);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EQUIPAMENTOS & BOM
+// ═══════════════════════════════════════════════════════════════
+function renderEquip(root){
+  let h=`<div class="mod-head"><div class="mod-badge">📦 Equipamentos</div><div class="mod-title">Bill of Materials</div><div class="mod-desc">Estrutura completa de componentes de cada equipamento. Dados importados da planilha Mistura 90.</div></div>`;
+
+  for(const[id,eq] of Object.entries(DATA.equipamentos)){
+    const nComp=countComps(eq.componentes);
+    h+=`<div class="card">
+      <div class="card-head" onclick="toggleBOM('${id}',this)" role="button" tabindex="0" aria-expanded="false" aria-controls="bom-body-${id}">
+        <div class="card-title">
+          <span class="tag tag-amber">${id}</span>
+          ${esc(eq.nome)}
+          <span class="tag">${eq.tipo}</span>
+          <span class="tag tag-teal">${nComp} itens</span>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="btn btn-teal" style="font-size:11px;padding:5px 10px" onclick="event.stopPropagation();exportBOM('${id}')" aria-label="Exportar BOM do equipamento ${id}">📎 BOM</button>
+          <button class="btn btn-danger" style="font-size:11px;padding:5px 10px" onclick="event.stopPropagation();delEquip('${id}')" aria-label="Excluir equipamento ${id}">🗑</button>
+          <span class="chevron" aria-hidden="true">▼</span>
+        </div>
+      </div>
+      <div class="card-body" id="bom-body-${id}">
+        <div id="bom-tree-${id}"></div>
+        <button class="btn-add" onclick="addRootComp('${id}')" aria-label="Adicionar componente raiz a ${id}">➕ Adicionar componente raiz</button>
+      </div>
+    </div>`;
+  }
+
+  h+=`<div class="card">
+    <div class="card-head open"><div class="card-title">➕ Novo Equipamento</div></div>
+    <div class="card-body open">
+      <div class="fgrid">
+        <div class="fg"><label for="nEqId">ID</label><input id="nEqId" placeholder="EX: TC-005"></div>
+        <div class="fg"><label for="nEqNome">Nome</label><input id="nEqNome" placeholder="Nome do equipamento"></div>
+        <div class="fg"><label for="nEqTipo">Tipo</label>
+          <select id="nEqTipo">${Object.entries(DATA.tipos).map(([id,t])=>`<option value="${id}">${esc(t.nome)}</option>`).join('')}</select>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btnCriarEquip" style="margin-top:14px">Criar Equipamento</button>
+    </div>
+  </div>`;
+
+  root.innerHTML=h;
+  for(const id of Object.keys(DATA.equipamentos)){
+    renderBOM(id);
+    const head = document.querySelector(`#bom-body-${id}`).previousElementSibling;
+    head.setAttribute('aria-expanded', 'false');
+  }
+
+  document.getElementById('btnCriarEquip').onclick=()=>{
+    const id=document.getElementById('nEqId').value.trim();
+    const nome=document.getElementById('nEqNome').value.trim();
+    const tipo=document.getElementById('nEqTipo').value;
+    if(!id||!nome){toast('Preencha ID e Nome','err');return;}
+    if(DATA.equipamentos[id]){toast('ID já existe','err');return;}
+    DATA.equipamentos[id]={id,nome,tipo,parametros_salvos:{},
+      componentes:[{id:newId(),nome:'Estrutura principal',qtd:1,descricao:'Base',subcomponentes:[]}],
+      criado_em:new Date().toISOString().slice(0,10)};
+    save(); renderEquip(root); toast(`Equipamento ${id} criado`);
+  };
+}
+
+function countComps(list){let n=list.length;for(const c of list)if(c.subcomponentes)n+=countComps(c.subcomponentes);return n;}
+
+window.toggleBOM=function(id,hd){
+  const body=document.getElementById(`bom-body-${id}`);
+  if(!body)return;
+  const open=body.classList.contains('open');
+  body.classList.toggle('open',!open);
+  body.style.display=open?'none':'block';
+  hd.classList.toggle('open',!open);
+  hd.setAttribute('aria-expanded', !open);
+  if(!open)renderBOM(id);
+};
+
+function renderBOM(eid){
+  const ct=document.getElementById(`bom-tree-${eid}`);
+  if(!ct)return;
+  const eq=DATA.equipamentos[eid];
+  if(!eq)return;
+  function ri(item,lv){
+    const ind=lv*18;
+    return `<div class="bom-item" style="margin-left:${ind}px">
+      <div class="bom-row">
+        <div class="bom-info">
+          <span class="bom-name">${esc(item.nome)}</span>
+          <span style="color:var(--text2);font-size:11px">Qtd:</span>
+          <input class="ei" type="number" style="width:64px" value="${item.qtd}" onchange="updQtd('${eid}','${item.id}',this.value)" aria-label="Quantidade de ${item.nome}">
+          <span style="color:var(--text2);font-size:11px">Descrição:</span>
+          <input class="ei" style="width:320px" value="${esc(item.descricao)}" onblur="updDesc('${eid}','${item.id}',this.value)" aria-label="Descrição de ${item.nome}">
+        </div>
+        <div class="bom-acts">
+          <button class="btn btn-teal" style="font-size:11px;padding:4px 9px" onclick="addSub('${eid}','${item.id}')" aria-label="Adicionar subcomponente a ${item.nome}">+ Sub</button>
+          <button class="btn btn-danger" style="font-size:11px;padding:4px 9px" onclick="delComp('${eid}','${item.id}')" aria-label="Excluir componente ${item.nome}">🗑</button>
+        </div>
+      </div>
+      ${item.subcomponentes?.length?`<div class="bom-tree">${item.subcomponentes.map(s=>ri(s,0)).join('')}</div>`:''}
+    </div>`;
+  }
+  ct.innerHTML=eq.componentes.map(c=>ri(c,0)).join('');
+}
+
+function findComp(list,id,fn){for(const i of list){if(i.id===id){fn(i);return true;}if(i.subcomponentes&&findComp(i.subcomponentes,id,fn))return true;}return false;}
+function removeComp(list,id){for(let i=0;i<list.length;i++){if(list[i].id===id){list.splice(i,1);return true;}if(list[i].subcomponentes&&removeComp(list[i].subcomponentes,id))return true;}return false;}
+
+window.updQtd=(eid,cid,v)=>{findComp(DATA.equipamentos[eid].componentes,cid,i=>i.qtd=parseInt(v)||1);save();renderBOM(eid);toast('Qtd atualizada');};
+window.updDesc=(eid,cid,v)=>{findComp(DATA.equipamentos[eid].componentes,cid,i=>i.descricao=v);save();};
+window.delComp=(eid,cid)=>{confirm_('Remover componente e filhos?',()=>{removeComp(DATA.equipamentos[eid].componentes,cid);save();renderBOM(eid);toast('Removido');});};
+window.addSub=(eid,pid)=>{
+  const nome=prompt('Nome do subcomponente:');if(!nome)return;
+  const qtd=parseInt(prompt('Quantidade:','1'))||1;
+  const desc=prompt('Descrição:')||'';
+  const novo={id:newId(),nome,qtd,descricao:desc,subcomponentes:[]};
+  findComp(DATA.equipamentos[eid].componentes,pid,i=>{if(!i.subcomponentes)i.subcomponentes=[];i.subcomponentes.push(novo);});
+  save();renderBOM(eid);toast('Subcomponente adicionado');
+};
+window.addRootComp=(eid)=>{
+  const nome=prompt('Nome:');if(!nome)return;
+  const qtd=parseInt(prompt('Quantidade:','1'))||1;
+  const desc=prompt('Descrição:')||'';
+  DATA.equipamentos[eid].componentes.push({id:newId(),nome,qtd,descricao:desc,subcomponentes:[]});
+  save();renderBOM(eid);toast('Componente adicionado');
+};
+window.delEquip=(id)=>{confirm_(`Excluir ${id}?`,()=>{delete DATA.equipamentos[id];save();renderEquip(document.getElementById('content'));toast(`${id} excluído`);});};
+window.exportBOM=(eid)=>{
+  const eq=DATA.equipamentos[eid];
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify({nome:eq.nome,tipo:eq.tipo,componentes:eq.componentes},null,2)]));
+  a.download=`BOM_${eid}.json`;a.click();toast('BOM exportada');
+};
+
+// ═══════════════════════════════════════════════════════════════
+// CONFIGURADOR
+// ═══════════════════════════════════════════════════════════════
+function renderConf(root){
+  const tid=curExtra;
+  const tipo=DATA.tipos[tid];
+  if(!tipo){root.innerHTML='<div class="empty"><div class="empty-icon">❓</div><p>Tipo não encontrado.</p></div>';return;}
+
+  root.innerHTML=`
+    <div class="mod-head"><div class="mod-badge">⚙️ Configurador</div><div class="mod-title">${esc(tipo.nome)}</div>
+    <div class="mod-desc">Preencha os parâmetros. As fórmulas e o memorial de cálculo são definidos pelo engenheiro responsável pelo tipo.</div></div>
+    <div class="card">
+      <div class="card-head open"><div class="card-title">📥 Parâmetros de Entrada</div></div>
+      <div class="card-body open">
+        <div class="fgrid" id="confParams"></div>
+        <button class="btn btn-primary" id="btnCalc" style="margin-top:16px">📐 Calcular Dimensionamento</button>
+      </div>
+    </div>
+    <div id="confResult"></div>`;
+
+  const pg=document.getElementById('confParams');
+  for(const p of tipo.parametros){
+    const saved=DATA.equipamentos[Object.keys(DATA.equipamentos).find(k=>DATA.equipamentos[k].tipo===tid)]?.parametros_salvos?.[p.nome];
+    const val=saved??p.default;
+    pg.innerHTML+=`<div class="fg"><label for="p_${p.nome}">${esc(p.label)}</label>
+      <input type="number" id="p_${p.nome}" step="any" value="${val}">
+      ${p.unidade?`<div class="hint">${esc(p.unidade)}</div>`:''}
+    </div>`;
+  }
+
+  document.getElementById('btnCalc').addEventListener('click',()=>{
+    let ctx={...DATA.constantes};
+    for(const p of tipo.parametros) ctx[p.nome]=parseFloat(document.getElementById(`p_${p.nome}`).value)||0;
+
+    let res={};let mem=[];let changed=true;let iter=0;
+    while(changed&&iter++<60){
+      changed=false;
+      for(const[nome,expr] of Object.entries(tipo.formulas)){
+        if(res[nome]!==undefined)continue;
+        try{
+          const full={...ctx,...res};
+          const fn=new Function(...Object.keys(full),`return (${expr});`);
+          const val=fn(...Object.values(full));
+          if(val!==undefined&&!isNaN(val)&&isFinite(val)){
+            res[nome]=val;
+            let sub=expr;
+            for(const[k,v] of Object.entries({...full,...res}))
+              if(typeof v==='number')sub=sub.split(k).join(rnd(v,4));
+            mem.push({nome,expr,sub,val});
+            changed=true;
+          }
+        }catch{}
+      }
+    }
+
+    let h=`<div class="card" style="margin-top:14px">
+      <div class="card-head open"><div class="card-title">📋 Memorial de Cálculo</div></div>
+      <div class="card-body open">
+        <div class="calc-box"><div class="calc-box-title">Passo a passo</div>`;
+    for(const s of mem){
+      h+=`<div class="calc-step">
+        <div class="calc-step-name">${s.nome.replace(/_/g,' ')}</div>
+        <div class="calc-step-orig">= ${esc(s.expr)}</div>
+        <div class="calc-step-sub">→ ${esc(s.sub)}</div>
+        <div class="calc-step-val">= ${rnd(s.val,4)}</div>
+      </div>`;
+    }
+    h+=`</div></div></div>`;
+
+    h+=`<div class="card">
+      <div class="card-head open"><div class="card-title">📊 Resultados Finais</div></div>
+      <div class="card-body open"><div class="fgrid">`;
+    for(const[nome,val] of Object.entries(res)){
+      h+=`<div class="fg"><label>${nome.replace(/_/g,' ')}</label><div class="calc-display">${typeof val==='number'?rnd(val,2):val}</div></div>`;
+    }
+    h+=`</div></div></div>`;
+
+    const pot=res.potencia_cv;
+    if(pot&&typeof pot==='number'){
+      const req=Math.ceil(pot);
+      let motores=[];
+      for(const eq of Object.values(DATA.equipamentos)){
+        for(const c of eq.componentes||[]){
+          const m=(c.descricao||'').match(/(\d+)\s*(cv|hp)/i);
+          if(m)motores.push({nome:eq.nome,id:eq.id,pot:parseInt(m[1])});
+        }
+      }
+      const compat=motores.filter(m=>m.pot>=req);
+      h+=`<div class="card">
+        <div class="card-head open"><div class="card-title">🔌 Compatibilidade de Motores no Estoque</div></div>
+        <div class="card-body open">
+          <p style="margin-bottom:12px;color:var(--text2);font-size:13px">Potência calculada: <strong style="color:var(--amber)">${req} cv</strong></p>`;
+      if(compat.length){
+        h+=`<div class="tbl-wrap" role="region" aria-label="Motores compatíveis"><table><thead><tr><th>Equipamento</th><th>ID</th><th>Potência</th><th>Status</th></tr></thead><tbody>`;
+        compat.forEach(m=>h+=`<tr><td>${esc(m.nome)}</td><td><span class="tag tag-amber">${m.id}</span></td><td>${m.pot} cv</td><td><span class="tag tag-green">✅ Compatível</span></td></tr>`);
+        h+=`</tbody></table></div>`;
+      }else{
+        h+=`<div class="alert alert-err">❌ Nenhum motor no estoque atende ${req} cv. Necessário adquirir.</div>`;
+      }
+      h+=`<button class="btn-add" id="btnCriarDeConf" style="margin-top:14px" aria-label="Criar equipamento com este dimensionamento">💾 Criar equipamento com este dimensionamento</button>
+        </div></div>`;
+    }
+
+    document.getElementById('confResult').innerHTML=h;
+
+    document.getElementById('btnCriarDeConf')?.addEventListener('click',()=>{
+      const nome=prompt('Nome do novo equipamento:',`${tipo.nome} dimensionado`);if(!nome)return;
+      const nid=genEquipId(tid);
+      DATA.equipamentos[nid]={id:nid,nome,tipo:tid,parametros_salvos:{...ctx},
+        componentes:[{id:newId(),nome:'Motor',qtd:1,descricao:`${Math.ceil(pot)} cv (dimensionado)`,subcomponentes:[]}],
+        criado_em:new Date().toISOString().slice(0,10)};
+      save();toast(`${nid} criado`);navigate('equipamentos');
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GERENCIAR TIPOS — COM EDITOR DE FÓRMULA INTELIGENTE
+// ═══════════════════════════════════════════════════════════════
+function renderTipos(root){
+  root.innerHTML=`
+    <div class="mod-head"><div class="mod-badge">📐 Administração</div><div class="mod-title">Gerenciar Tipos</div>
+    <div class="mod-desc">Crie e edite tipos de equipamento. O editor de fórmulas valida variáveis em tempo real — sem necessidade de saber programar.</div></div>
+    <div id="tiposGrid" class="tipos-grid"></div>
+    <button class="btn-add" id="btnNovoTipo" aria-label="Criar novo tipo de equipamento">➕ Criar novo tipo</button>`;
+  renderTiposGrid();
+  document.getElementById('btnNovoTipo').onclick=()=>abrirModalTipo(null);
+}
+
+function renderTiposGrid(){
+  const g=document.getElementById('tiposGrid');
+  if(!g)return;
+  if(!Object.keys(DATA.tipos).length){
+    g.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-icon">📐</div><p>Nenhum tipo. Crie o primeiro!</p></div>';return;
+  }
+  g.innerHTML=Object.entries(DATA.tipos).map(([id,t])=>{
+    const nEq=Object.values(DATA.equipamentos).filter(e=>e.tipo===id).length;
+    const nF=Object.keys(t.formulas||{}).length;
+    const nP=t.parametros?.length||0;
+    return `<div class="tipo-card">
+      <div class="tipo-id">id: ${esc(id)}</div>
+      <div class="tipo-name">${esc(t.nome)}</div>
+      <div class="tipo-stats">
+        <div class="tipo-stat"><strong>${nP}</strong>parâmetros</div>
+        <div class="tipo-stat"><strong>${nF}</strong>fórmulas</div>
+        <div class="tipo-stat"><strong>${nEq}</strong>equip.</div>
+      </div>
+      <div class="tipo-tags">${(t.parametros||[]).map(p=>`<span class="tag">${esc(p.nome)}</span>`).join('')}</div>
+      <div class="tipo-acts">
+        <button class="btn btn-teal" onclick="abrirModalTipo('${id}')" aria-label="Editar tipo ${t.nome}">✏️ Editar</button>
+        <button class="btn btn-danger" onclick="delTipo('${id}')" aria-label="Excluir tipo ${t.nome}">🗑 Excluir</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.delTipo=(id)=>{
+  const n=Object.values(DATA.equipamentos).filter(e=>e.tipo===id).length;
+  confirm_(`Excluir tipo "${DATA.tipos[id]?.nome}"?${n?` (${n} equipamento(s) afetado(s))`:''}`,()=>{
+    delete DATA.tipos[id];save();buildMenu();renderTipos(document.getElementById('content'));toast('Tipo excluído');
+  });
+};
+
+// Gerenciamento de foco para modais
+let lastFocus = null;
+
+function trapFocus(e, container) {
+  if (!container.contains(e.target)) {
+    const focusable = container.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (focusable.length) focusable[0].focus();
+  }
+}
+
+function openModal(modalElement) {
+  lastFocus = document.activeElement;
+  modalElement.classList.add('show');
+  modalElement.setAttribute('aria-hidden', 'false');
+  const focusable = modalElement.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  if (focusable.length) focusable[0].focus();
+  document.body.addEventListener('focus', function(e) { trapFocus(e, modalElement); }, true);
+}
+
+function closeModal(modalElement) {
+  modalElement.classList.remove('show');
+  modalElement.setAttribute('aria-hidden', 'true');
+  if (lastFocus) lastFocus.focus();
+  document.body.removeEventListener('focus', trapFocus, true);
+}
+
+window.abrirModalTipo=function(tid){
+  const orig=tid?DATA.tipos[tid]:null;
+  const draft=orig?JSON.parse(JSON.stringify(orig)):{id:'',nome:'',parametros:[],formulas:{}};
+  const paramNames=()=>(draft.parametros||[]).map(p=>p.nome);
+  const constNames=Object.keys(DATA.constantes);
+
+  const bd=document.createElement('div');
+  bd.className='modal-bg show';
+  bd.setAttribute('role', 'dialog');
+  bd.setAttribute('aria-modal', 'true');
+  bd.setAttribute('aria-labelledby', 'modalTitle');
+  bd.innerHTML=`<div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modalTitle">${tid?'✏️ Editar Tipo':'➕ Novo Tipo'}</div>
+      <button class="modal-close" id="mt_x" aria-label="Fechar">✕</button>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-sec-title">Identificação</div>
+      <div class="fgrid">
+        <div class="fg"><label for="mt_id">ID único</label>
+          <input id="mt_id" placeholder="ex: silo" value="${esc(draft.id)}" ${tid?'readonly style="opacity:.5"':''}>
+          <div class="hint">letras_minúsculas_sem_espaços — não pode mudar depois</div>
+        </div>
+        <div class="fg"><label for="mt_nome">Nome amigável</label>
+          <input id="mt_nome" placeholder="ex: Silo de Armazenagem" value="${esc(draft.nome)}">
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-sec-title">Parâmetros de Entrada</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">O nome de cada parâmetro vira uma variável disponível nas fórmulas abaixo.</div>
+      <div id="mt_params"></div>
+      <button class="btn btn-ghost" style="margin-top:8px;font-size:12px" id="mt_addp" aria-label="Adicionar parâmetro">➕ Adicionar parâmetro</button>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-sec-title">Fórmulas de Cálculo</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">
+        Use operadores matemáticos normais: <code style="color:var(--amber)">+ - * / ( )</code>.
+        Funções disponíveis: <code style="color:var(--teal)">Math.sqrt() Math.ceil() Math.PI Math.abs()</code>.
+        As variáveis são os nomes dos parâmetros e as constantes globais.
+        O sistema valida tudo em tempo real.
+      </div>
+      <div id="mt_formulas"></div>
+      <button class="btn btn-ghost" style="margin-top:8px;font-size:12px" id="mt_addf" aria-label="Adicionar fórmula">➕ Adicionar fórmula</button>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn btn-ghost" id="mt_cancel">Cancelar</button>
+      <button class="btn btn-primary" id="mt_save">💾 Salvar Tipo</button>
+    </div>
+  </div>`;
+  document.body.appendChild(bd);
+  openModal(bd);
+
+  // ── render PARAMS ──────────────────────────────────────────
+  function rpParams(){
+    const ct=document.getElementById('mt_params');
+    if(!ct)return;
+    if(!draft.parametros.length){
+      ct.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:6px 0">Nenhum parâmetro. Adicione abaixo.</div>`;return;
+    }
+    ct.innerHTML=draft.parametros.map((p,i)=>`
+      <div class="fe-param-row" data-i="${i}">
+        <div>
+          <div class="fe-col-label">Nome (variável)</div>
+          <input class="p_nome" data-i="${i}" value="${esc(p.nome)}" placeholder="capacidade" aria-label="Nome da variável do parâmetro ${i+1}">
+        </div>
+        <div>
+          <div class="fe-col-label">Rótulo exibido</div>
+          <input class="p_label" data-i="${i}" value="${esc(p.label)}" placeholder="Capacidade (t/h)" aria-label="Rótulo do parâmetro ${i+1}">
+        </div>
+        <div>
+          <div class="fe-col-label">Valor padrão</div>
+          <input type="number" step="any" class="p_def" data-i="${i}" value="${p.default}" aria-label="Valor padrão do parâmetro ${i+1}">
+        </div>
+        <div>
+          <div class="fe-col-label">Unidade</div>
+          <input class="p_unit" data-i="${i}" value="${esc(p.unidade||'')}" placeholder="t/h" aria-label="Unidade do parâmetro ${i+1}">
+        </div>
+        <button class="btn-rm" data-ri="${i}" aria-label="Remover parâmetro">✕</button>
+      </div>`).join('');
+    ct.querySelectorAll('.p_nome').forEach(inp=>{inp.addEventListener('input',e=>{draft.parametros[+e.target.dataset.i].nome=e.target.value.replace(/\s+/g,'_');refreshAllFormulas();});});
+    ct.querySelectorAll('.p_label').forEach(inp=>{inp.addEventListener('input',e=>{draft.parametros[+e.target.dataset.i].label=e.target.value;});});
+    ct.querySelectorAll('.p_def').forEach(inp=>{inp.addEventListener('input',e=>{draft.parametros[+e.target.dataset.i].default=parseFloat(e.target.value)||0;});});
+    ct.querySelectorAll('.p_unit').forEach(inp=>{inp.addEventListener('input',e=>{draft.parametros[+e.target.dataset.i].unidade=e.target.value;});});
+    ct.querySelectorAll('.btn-rm').forEach(btn=>{btn.addEventListener('click',()=>{draft.parametros.splice(+btn.dataset.ri,1);rpParams();refreshAllFormulas();});});
+  }
+
+  // ── render FORMULAS ───────────────────────────────────────
+  function rpFormulas(){
+    const ct=document.getElementById('mt_formulas');
+    if(!ct)return;
+    const entries=Object.entries(draft.formulas);
+    if(!entries.length){
+      ct.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:6px 0">Nenhuma fórmula. Adicione abaixo.</div>`;return;
+    }
+    ct.innerHTML=entries.map(([key,expr],i)=>`
+      <div class="fe-wrap" data-fi="${i}">
+        <div class="fgrid" style="margin-bottom:10px">
+          <div class="fg">
+            <div class="fe-col-label">Nome do resultado</div>
+            <input class="f_nome" data-fi="${i}" data-key="${esc(key)}" value="${esc(key)}" placeholder="potencia_cv" aria-label="Nome da variável de resultado da fórmula ${i+1}">
+            <div class="hint">sem espaços — vira variável nas próximas fórmulas</div>
+          </div>
+          <div class="fg" style="grid-column:span 2">
+            <div class="fe-col-label">Expressão matemática</div>
+            <input class="f_expr" data-fi="${i}" data-key="${esc(key)}" value="${esc(expr)}" placeholder="ex: (Pm * velocidade * altura) / (75 * rendimento)" style="font-family:var(--mono)" aria-label="Expressão da fórmula ${i+1}">
+          </div>
+          <button class="btn-rm" data-fkey="${esc(key)}" style="margin-top:18px" aria-label="Remover fórmula">✕</button>
+        </div>
+        <div class="vars-row" id="fvars_${i}"></div>
+        <div id="falert_${i}"></div>
+        <div class="fpreview" id="fprev_${i}" style="margin-top:8px">
+          <span class="fp-name" id="fpn_${i}">${esc(key)}</span>
+          <span class="fp-eq">=</span>
+          <span class="fp-expr" id="fpe_${i}">${esc(prettify(expr))}</span>
+        </div>
+      </div>`).join('');
+
+    entries.forEach(([key,expr],i)=>analyzeFormula(i,key,expr));
+
+    ct.querySelectorAll('.f_nome').forEach(inp=>{
+      inp.addEventListener('change',e=>{
+        const oldKey=e.target.dataset.key;
+        const newKey=e.target.value.trim().replace(/\s+/g,'_');
+        if(!newKey||newKey===oldKey)return;
+        const newF={};
+        for(const[k,v] of Object.entries(draft.formulas)) newF[k===oldKey?newKey:k]=v;
+        draft.formulas=newF;
+        rpFormulas();
+      });
+    });
+    ct.querySelectorAll('.f_expr').forEach(inp=>{
+      inp.addEventListener('input',e=>{
+        const key=e.target.dataset.key;
+        const i=+e.target.dataset.fi;
+        draft.formulas[key]=e.target.value;
+        analyzeFormula(i,key,e.target.value);
+      });
+    });
+    ct.querySelectorAll('[data-fkey]').forEach(btn=>{
+      btn.addEventListener('click',()=>{delete draft.formulas[btn.dataset.fkey];rpFormulas();});
+    });
+  }
+
+  function analyzeFormula(i,key,expr){
+    const allVars=extractVars(expr);
+    const pNames=paramNames();
+    const prevResKeys=Object.keys(draft.formulas).slice(0,i);
+    const ok=[],con=[],prev=[],unk=[];
+    allVars.forEach(v=>{
+      if(pNames.includes(v))ok.push(v);
+      else if(constNames.includes(v))con.push(v);
+      else if(prevResKeys.includes(v))prev.push(v);
+      else unk.push(v);
+    });
+    const vr=document.getElementById(`fvars_${i}`);
+    const al=document.getElementById(`falert_${i}`);
+    if(vr){
+      let ph='';
+      ok.forEach(v=>ph+=`<span class="pill pill-ok">📥 ${v}</span>`);
+      con.forEach(v=>ph+=`<span class="pill pill-const">🔧 ${v}</span>`);
+      prev.forEach(v=>ph+=`<span class="pill" style="background:rgba(79,163,224,.1);color:var(--blue);border:1px solid rgba(79,163,224,.3)">→ ${v}</span>`);
+      unk.forEach(v=>ph+=`<span class="pill pill-unk">❓ ${v}</span>`);
+      if(!allVars.length)ph=`<span style="font-size:10px;color:var(--text3)">Nenhuma variável detectada</span>`;
+      vr.innerHTML=ph;
+    }
+    if(al){
+      if(unk.length)al.innerHTML=`<div class="alert alert-warn" role="alert">⚠️ Variáveis não reconhecidas: <strong>${unk.join(', ')}</strong> — verifique os nomes ou adicione como parâmetros.</div>`;
+      else if(allVars.length)al.innerHTML=`<div class="alert alert-ok" role="status">✅ Todas as variáveis reconhecidas.</div>`;
+      else al.innerHTML='';
+    }
+  }
+
+  function refreshAllFormulas(){
+    const entries=Object.entries(draft.formulas);
+    entries.forEach(([k,e],i)=>analyzeFormula(i,k,e));
+  }
+
+  rpParams();rpFormulas();
+
+  document.getElementById('mt_addp').addEventListener('click',()=>{
+    draft.parametros.push({nome:`param_${draft.parametros.length+1}`,label:'Novo parâmetro',tipo:'number',default:0,unidade:''});
+    rpParams();refreshAllFormulas();
+  });
+  document.getElementById('mt_addf').addEventListener('click',()=>{
+    const k=`resultado_${Object.keys(draft.formulas).length+1}`;
+    draft.formulas[k]='expressão aqui';
+    rpFormulas();
+  });
+  document.getElementById('mt_x').addEventListener('click',()=>closeModal(bd));
+  document.getElementById('mt_cancel').addEventListener('click',()=>closeModal(bd));
+
+  document.getElementById('mt_save').addEventListener('click',()=>{
+    const nid=document.getElementById('mt_id').value.trim().replace(/\s+/g,'_');
+    const nome=document.getElementById('mt_nome').value.trim();
+    if(!nid){toast('ID é obrigatório','err');return;}
+    if(!nome){toast('Nome é obrigatório','err');return;}
+    if(!/^[a-z0-9_]+$/i.test(nid)){toast('ID: só letras, números e _','err');return;}
+    if(!tid&&DATA.tipos[nid]){toast('ID já existe','err');return;}
+    for(const p of draft.parametros)if(!p.nome.trim()){toast('Parâmetro sem nome','err');return;}
+    DATA.tipos[nid]={id:nid,nome,parametros:draft.parametros.map(p=>({...p,tipo:'number'})),formulas:{...draft.formulas}};
+    save();bd.remove();buildMenu();renderTipos(document.getElementById('content'));toast(`Tipo "${nome}" salvo`);
+    closeModal(bd);
+  });
+};
+
+// ═══════════════════════════════════════════════════════════════
+// CONSTANTES
+// ═══════════════════════════════════════════════════════════════
+function renderConst(root){
+  root.innerHTML=`
+    <div class="mod-head"><div class="mod-badge">🔧 Constantes</div><div class="mod-title">Constantes Globais</div>
+    <div class="mod-desc">Valores técnicos compartilhados por todas as fórmulas. Alterações afetam todos os cálculos.</div></div>
+    <div class="card">
+      <div class="card-head open"><div class="card-title">Valores atuais</div></div>
+      <div class="card-body open">
+        <div class="fgrid" id="constGrid"></div>
+        <button class="btn btn-primary" id="btnSaveConst" style="margin-top:16px">💾 Salvar Constantes</button>
+      </div>
+    </div>`;
+  const g=document.getElementById('constGrid');
+  const descs={CF1:'Coef. enchimento (máx 1.0)',CF2:'Coef. homogeneidade carga',n_fileiras:'Nº de fileiras de canecas',
+    passo_mm:'Passo das canecas (mm)',D_tambor:'Diâmetro do tambor (m)',rendimento:'Rendimento do acionamento',
+    largura_correia_mm:'Largura da correia (mm)',Ho_centrifugo:'Altura compensação centrífugo (m)',Ho_continuo:'Altura compensação contínuo (m)',
+    k_esticador:'Fator esticador manual c/ tambor emborrachado',Tu_lona:'Tensão admissível por lona (kgf/cm.lona)',pi:'π'};
+  for(const[k,v] of Object.entries(DATA.constantes)){
+    g.innerHTML+=`<div class="fg"><label for="kv_${k}">${k}</label><input type="number" step="any" id="kv_${k}" value="${v}">
+      ${descs[k]?`<div class="hint">${descs[k]}</div>`:''}
+    </div>`;
+  }
+  document.getElementById('btnSaveConst').onclick=()=>{
+    for(const k of Object.keys(DATA.constantes)) DATA.constantes[k]=parseFloat(document.getElementById(`kv_${k}`).value)||0;
+    save();toast('Constantes salvas');
+  };
+}
+
+// ═══ INIT ═════════════════════════════════════════════════════
+document.getElementById('btnSave').addEventListener('click',()=>{save();toast('Dados salvos');});
+document.getElementById('btnReset').addEventListener('click',()=>{
+  confirm_('Restaurar todos os dados ao padrão de fábrica? (dados da planilha Mistura 90)',()=>{
+    DATA=JSON.parse(JSON.stringify(DEFAULT));save();buildMenu();renderContent();toast('Restaurado');
+  });
+});
+document.getElementById('hbg').addEventListener('click',()=>{
+  const sb=document.getElementById('sb');
+  const overlay=document.getElementById('overlay');
+  const expanded = sb.classList.contains('open');
+  sb.classList.toggle('open');
+  overlay.classList.toggle('show');
+  document.getElementById('hbg').setAttribute('aria-expanded', !expanded);
+});
+document.getElementById('sbClose').addEventListener('click',closeSb);
+document.getElementById('overlay').addEventListener('click',closeSb);
+document.getElementById('btnExport').addEventListener('click',()=>{
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(DATA,null,2)]));
+  a.download=`mistura90_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();toast('Exportado');
+});
+document.getElementById('btnImportTrig').addEventListener('click',()=>document.getElementById('fileImport').click());
+document.getElementById('fileImport').addEventListener('change',e=>{
+  if(!e.target.files[0])return;
+  const fr=new FileReader();
+  fr.onload=ev=>{try{DATA=JSON.parse(ev.target.result);save();buildMenu();renderContent();toast('Importado');}catch{toast('JSON inválido','err');}};
+  fr.readAsText(e.target.files[0]);e.target.value='';
+});
+document.getElementById('confirmNo').addEventListener('click',closeConfirm);
+document.getElementById('confirmYes').addEventListener('click',()=>{
+  closeConfirm();
+  if(confirmCb){confirmCb();confirmCb=null;}
+});
+
+// Teclado: Escape fecha modais, confirmação e sidebar
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const modal = document.querySelector('.modal-bg.show');
+    if (modal) closeModal(modal);
+    const confirm = document.querySelector('.confirm-bg.show');
+    if (confirm) closeConfirm();
+    if (document.getElementById('sb').classList.contains('open')) closeSb();
+  }
+});
+
+buildMenu();
+navigate('equipamentos');
+
+// ═══════════════════════════════════════════════════════════════
+// SISTEMA DE ACESSIBILIDADE PCD — IMPACTO MÁXIMO
+// Perceptível · Operável · Compreensível · Robusto
+// ═══════════════════════════════════════════════════════════════
+(function A11Y() {
+  'use strict';
+
+  /* ── Escalonamento de fonte: 100% → 200% em 5 degraus ── */
+  const PREF_KEY  = 'a11y_prefs_v3';
+  const FONT_STEPS  = [100, 115, 135, 165, 200];
+  const FONT_LABELS = ['Normal (100%)', 'Médio (115%)', 'Grande (135%)', 'Muito grande (165%)', 'Máximo (200%)'];
+  const FONT_CLASSES = ['', 'a11y-f1', 'a11y-f2', 'a11y-f3', 'a11y-f4', 'a11y-f5'];
+  // f1=112% f2=130% f3=155% f4=185% f5=200% — mapeamento indireto:
+  const FONT_CLASS_MAP = ['', 'a11y-f1', 'a11y-f2', 'a11y-f3', 'a11y-f4', 'a11y-f5'];
+
+  let prefs = { hc:false, fontIdx:0, read:false, focus:false, touch:false, motion:false, space:false };
+
+  function loadPrefs() {
+    try {
+      const s = localStorage.getItem(PREF_KEY);
+      if (s) {
+        const p = JSON.parse(s);
+        prefs = { ...prefs, ...p };
+        prefs.fontIdx = Math.max(0, Math.min(FONT_STEPS.length - 1, prefs.fontIdx || 0));
+      }
+    } catch(e) {}
+  }
+  function savePrefs() {
+    try { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); } catch(e) {}
+  }
+
+  /* ── Refs DOM ── */
+  const btn      = document.getElementById('a11yBtn');
+  const panel    = document.getElementById('a11yPanel');
+  const closeBtn = document.getElementById('a11yClose');
+  const liveReg  = document.getElementById('a11y-announce');
+
+  const togHC     = document.getElementById('togHC');
+  const togRead   = document.getElementById('togRead');
+  const togFocus  = document.getElementById('togFocus');
+  const togTouch  = document.getElementById('togTouch');
+  const togMotion = document.getElementById('togMotion');
+  const togSpace  = document.getElementById('togSpace');
+  const fontVal   = document.getElementById('fontVal');
+  const fontDesc  = document.getElementById('fontSizeDesc');
+  const fontInc   = document.getElementById('fontInc');
+  const fontDec   = document.getElementById('fontDec');
+
+  /* ── Aplicar todas as preferências ── */
+  function applyAll() {
+    const b = document.body;
+
+    // 1. Alto contraste extremo
+    b.classList.toggle('a11y-hc', prefs.hc);
+    togHC.checked = prefs.hc;
+    togHC.setAttribute('aria-checked', String(prefs.hc));
+
+    // 2. Fonte — remove todas, aplica a correta
+    FONT_CLASS_MAP.forEach(c => { if (c) b.classList.remove(c); });
+    const fc = FONT_CLASS_MAP[prefs.fontIdx];
+    if (fc) b.classList.add(fc);
+    const pct = FONT_STEPS[prefs.fontIdx] + '%';
+    fontVal.textContent = pct;
+    fontDesc.textContent = FONT_LABELS[prefs.fontIdx];
+    fontDec.disabled = prefs.fontIdx === 0;
+    fontInc.disabled = prefs.fontIdx === FONT_STEPS.length - 1;
+    fontDec.setAttribute('aria-disabled', String(prefs.fontIdx === 0));
+    fontInc.setAttribute('aria-disabled', String(prefs.fontIdx === FONT_STEPS.length - 1));
+
+    // 3. Modo leitura
+    b.classList.toggle('a11y-read', prefs.read);
+    togRead.checked = prefs.read;
+    togRead.setAttribute('aria-checked', String(prefs.read));
+
+    // 4. Foco extremo
+    b.classList.toggle('a11y-focus', prefs.focus);
+    togFocus.checked = prefs.focus;
+    togFocus.setAttribute('aria-checked', String(prefs.focus));
+
+    // 5. Alvos gigantes
+    b.classList.toggle('a11y-touch', prefs.touch);
+    togTouch.checked = prefs.touch;
+    togTouch.setAttribute('aria-checked', String(prefs.touch));
+
+    // 6. Parar movimento
+    b.classList.toggle('a11y-motion', prefs.motion);
+    togMotion.checked = prefs.motion;
+    togMotion.setAttribute('aria-checked', String(prefs.motion));
+
+    // 7. Espaçamento máximo
+    b.classList.toggle('a11y-space', prefs.space);
+    togSpace.checked = prefs.space;
+    togSpace.setAttribute('aria-checked', String(prefs.space));
+
+    // Indicador de modos ativos no botão
+    const hasAny = prefs.hc || prefs.read || prefs.focus ||
+                   prefs.touch || prefs.motion || prefs.space || prefs.fontIdx > 0;
+    btn.classList.toggle('has-active', hasAny);
+    btn.setAttribute('aria-label',
+      hasAny ? 'Acessibilidade ativada — abrir painel' : 'Abrir painel de acessibilidade');
+  }
+
+  /* ── Região live para leitores de tela ── */
+  function announce(msg) {
+    liveReg.textContent = '';
+    requestAnimationFrame(() => { liveReg.textContent = msg; });
+  }
+
+  /* ── Eventos de toggle ── */
+  togHC.addEventListener('change', () => {
+    prefs.hc = togHC.checked; applyAll(); savePrefs();
+    announce(prefs.hc ? 'Alto contraste extremo ativado. Preto e amarelo neon.' : 'Alto contraste desativado.');
+  });
+  togRead.addEventListener('change', () => {
+    prefs.read = togRead.checked; applyAll(); savePrefs();
+    announce(prefs.read ? 'Modo leitura ativado. Decorações removidas.' : 'Modo leitura desativado.');
+  });
+  togFocus.addEventListener('change', () => {
+    prefs.focus = togFocus.checked; applyAll(); savePrefs();
+    announce(prefs.focus ? 'Foco extremo ativado. Anel triplo âmbar.' : 'Foco padrão restaurado.');
+  });
+  togTouch.addEventListener('change', () => {
+    prefs.touch = togTouch.checked; applyAll(); savePrefs();
+    announce(prefs.touch ? 'Alvos gigantes ativados. Botões mínimo 60 por 60 pixels.' : 'Tamanho de botão normal.');
+  });
+  togMotion.addEventListener('change', () => {
+    prefs.motion = togMotion.checked; applyAll(); savePrefs();
+    announce(prefs.motion ? 'Animações paradas. Nenhuma transição ativa.' : 'Animações normais.');
+  });
+  togSpace.addEventListener('change', () => {
+    prefs.space = togSpace.checked; applyAll(); savePrefs();
+    announce(prefs.space ? 'Espaçamento máximo ativado.' : 'Espaçamento normal.');
+  });
+
+  fontInc.addEventListener('click', () => {
+    if (prefs.fontIdx < FONT_STEPS.length - 1) {
+      prefs.fontIdx++; applyAll(); savePrefs();
+      announce('Fonte aumentada para ' + FONT_LABELS[prefs.fontIdx] + '.');
+    }
+  });
+  fontDec.addEventListener('click', () => {
+    if (prefs.fontIdx > 0) {
+      prefs.fontIdx--; applyAll(); savePrefs();
+      announce('Fonte reduzida para ' + FONT_LABELS[prefs.fontIdx] + '.');
+    }
+  });
+
+  /* ── Painel: abrir / fechar ── */
+  let panelOpen = false;
+  let lastFocus = null;
+
+  function openPanel() {
+    panelOpen = true;
+    lastFocus = document.activeElement;
+    panel.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+    const first = panel.querySelector('input[type=checkbox], button:not([disabled])');
+    if (first) first.focus();
+    announce('Painel de acessibilidade aberto.');
+  }
+  function closePanel() {
+    panelOpen = false;
+    panel.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+    if (lastFocus) lastFocus.focus();
+    announce('Painel de acessibilidade fechado.');
+  }
+  function togglePanel() { panelOpen ? closePanel() : openPanel(); }
+
+  btn.addEventListener('click', togglePanel);
+  closeBtn.addEventListener('click', closePanel);
+
+  /* ── Teclado global ── */
+  document.addEventListener('keydown', (e) => {
+    if (e.altKey && (e.key === 'a' || e.key === 'A')) {
+      e.preventDefault(); togglePanel(); return;
+    }
+    if (!panelOpen) return;
+    if (e.key === 'Escape') { closePanel(); return; }
+    // Trap de foco
+    if (e.key === 'Tab') {
+      const els = [...panel.querySelectorAll('button:not([disabled]), input[type=checkbox]')];
+      const first = els[0], last = els[els.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+
+  // Fechar ao clicar fora
+  document.addEventListener('click', (e) => {
+    if (panelOpen && !panel.contains(e.target) && !btn.contains(e.target)) closePanel();
+  });
+
+  /* ── Inicializar ── */
+  loadPrefs();
+  applyAll();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+1. Conceito de Modelo Pai (Template Padrão)
+Cada tipo de equipamento (elevador, transportador, peneira, moinho) possui um modelo matemático fixo, baseado em normas da engenharia (CEMA, Tratamento de Minérios, Bond). Esse modelo contém:
+
+Fórmulas que relacionam parâmetros de entrada (capacidade, altura, densidade) com características técnicas (volume da caneca, potência do motor, torque, etc.).
+
+Premissas constantes (número de fileiras, coeficientes de enchimento, passos padrão, rendimentos) que representam o “projeto base” da empresa.
+
+Quando o usuário informa novos valores, o sistema recalcula todas as especificações sem depender de um equipamento específico já cadastrado. Isso permite projetar novos equipamentos a partir de componentes existentes.
+
+2. Fluxo de utilização
+Selecionar tipo – o usuário escolhe o equipamento que deseja dimensionar.
+
+Inserir parâmetros – conforme o tipo, aparecem campos específicos (capacidade, altura, densidade, etc.).
+
+Clicar em “Dimensionar” – o sistema executa as fórmulas do modelo pai e gera:
+
+Especificações calculadas (ex.: volume da caneca, potência requerida, torque).
+
+Lista de motores compatíveis extraídos do estoque (baseado nos equipamentos já existentes no sistema).
+
+Analisar resultado – o engenheiro vê quais motores (e outros componentes) podem ser usados no novo projeto.
+
+3. Como a empresa define o “modelo pai” personalizado
+No arquivo, as funções de dimensionamento (dimensionarEquipamento) contêm as fórmulas e premissas. Para adaptar à realidade da empresa, basta alterar:
+
+Parâmetros fixos (ex.: CF1 = 0.75, e = 350 mm, rendimento = 0.95).
+
+Fatores de segurança (ex.: multiplicar potência calculada por 1,2).
+
+Fontes de estoque – atualmente o sistema varre o objeto DATA. A empresa pode substituir por uma base de dados própria (API ou JSON externo).
+
+4. Exemplo prático (elevador para grãos)
+Conforme solicitado no artigo, um estudo de caso foi implementado no código:
+
+Entrada: capacidade 150 t/h, altura 20 m, densidade 0,75 t/m³ (soja), velocidade 1,5 m/s.
+
+Cálculo do modelo pai:
+V = (Q * e) / (3600 * n * v * CF1 * CF2 * γ)
+Resultado: volume da caneca ≈ 10,2 litros → arredondado para 10,5 L.
+
+Potência: Pm = 1000 * γ * V / e ≈ 22,5 kg/m;
+N = v * Pm * (H + 7D) / (75 * 0.95) ≈ 13,6 cv → com folga: 18 cv.
+
+Compatibilidade: o sistema lista motores do estoque com potência ≥ 18 cv (ex.: motor de 30 cv do EL-001).
+
+Este fluxo elimina a necessidade de refazer cálculos manualmente e garante que apenas componentes existentes sejam sugeridos.
+
+5. Vantagens para a empresa
+Redução de erros – evita dimensionamentos inconsistentes.
+
+Aproveitamento de estoque – evita compras desnecessárias.
+
+Velocidade – um novo projeto pode ser configurado em menos de 1 minuto.
+
+Rastreabilidade – todos os parâmetros e resultados ficam registrados.
+
+6. Como configurar novos modelos pai
+A empresa pode expandir o código adicionando mais tipos de equipamento (ex.: britadores, classificadores) ou alterar as constantes dentro da função dimensionarEquipamento. Basta editar as fórmulas conforme a literatura técnica adotada.
+
